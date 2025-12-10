@@ -6,7 +6,7 @@ simulation_script="${project_root}/scripts/simulate_short_reads.sh"
 Job_name=iss_sim
 cpus=8
 memory=20GB
-time=00:30:00
+time=02:00:00
 
 
 mkdir -p "${project_root}/slurm_scripts"
