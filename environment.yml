@@ -419,4 +419,3 @@ dependencies:
       - transformers==4.27.0
       - triton==3.4.0
       - wrapt==2.0.1
-prefix: /lisc/home/user/szambor/.conda/envs/env_wpip
