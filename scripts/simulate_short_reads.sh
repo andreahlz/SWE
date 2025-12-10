@@ -25,4 +25,5 @@ iss generate\
     --n_reads ${n_reads}\
     --seed ${seed}\
     --cpus ${cpus}\
+    --compress\
     --output ${output_dir}/${file_name}
