@@ -1,0 +1,10 @@
+
+
+GCF_009731575.1		# Akkermansia muciniphila
+GCF_000025985.1		# Bacteroides fragilis NCTC 9343
+GCF_000196555.1		# Bifidobacterium longum subsp. longum JCM 1217
+GCF_025147765.1		# Blautia obeum ATCC 29174
+GCF_029024925.1		# Enterococcus faecalis
+GCF_049532935.1		# Faecalibacterium prausnitzii
+GCF_001953955.1		# Prevotella intermedia ATCC 25611 = DSM 20706
+GCF_900537995.1		# Roseburia intestinalis L1-82
