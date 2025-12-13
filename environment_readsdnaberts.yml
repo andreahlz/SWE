@@ -1,9 +1,10 @@
 name: readsdnaberts
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
 dependencies:
   - python=3.9
+  - pip
   - einops
   - peft
   - omegaconf
@@ -16,9 +17,9 @@ dependencies:
   - gdown
   - insilicoseq
   - badread
-  - pip
+ 
   - pip:
-    - textblob==0.17.1
-    - textaugment
-    - torch
-    - transformers==4.27
+      - textblob==0.17.1
+      - textaugment
+      - torch
+      - transformers==4.27
