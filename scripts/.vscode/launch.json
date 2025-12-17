@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Debug dnabert_s.py (prompt inputs)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dnabert_s.py",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inputFile",
+      "type": "promptString",
+      "description": "Path to input fasta/reads (press Enter to accept default)",
+      "default": "data/genomes/processed/Akkermansia_muciniphila_genomic.fna"
+    },
+    {
+      "id": "kmer",
+      "type": "promptString",
+      "description": "k-mer size",
+      "default": "6"
+    },
+    {
+      "id": "logLevel",
+      "type": "pickString",
+      "description": "Log level",
+      "options": ["DEBUG", "INFO", "WARNING", "ERROR"],
+      "default": "DEBUG"
+    }
+  ]
+}
