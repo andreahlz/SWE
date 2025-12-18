@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {"name":"Python Debugger: Current File","type":"debugpy","request":"launch","program":"${file}","console":"integratedTerminal"},
+    {
+      "name": "Python: Debug dnabert_s.py (prompt inputs)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dnabert_s.py",
+      "console": "integratedTerminal",
+      "args": [],  // ← Explizit keine Arguments
+      "justMyCode": false
+    }
+  ]
+}
