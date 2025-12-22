@@ -1,34 +1,15 @@
 {
   "version": "0.2.0",
   "configurations": [
+    {"name":"Python Debugger: Current File","type":"debugpy","request":"launch","program":"${file}","console":"internalConsole"},
     {
-      "name": "Python: Debug dnabert_s.py (prompt inputs)",
+      "name": "Python: Debug evalclusclass",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/scripts/dnabert_s.py",
-      "console": "integratedTerminal",
+      "program": "/home/barbara/evaluate/eval_clustering_classification.py",
+      "console": "internalConsole",
+      "args": [],  // ← Explizit keine Arguments
       "justMyCode": false
-    }
-  ],
-  "inputs": [
-    {
-      "id": "inputFile",
-      "type": "promptString",
-      "description": "Path to input fasta/reads (press Enter to accept default)",
-      "default": "data/genomes/processed/Akkermansia_muciniphila_genomic.fna"
-    },
-    {
-      "id": "kmer",
-      "type": "promptString",
-      "description": "k-mer size",
-      "default": "6"
-    },
-    {
-      "id": "logLevel",
-      "type": "pickString",
-      "description": "Log level",
-      "options": ["DEBUG", "INFO", "WARNING", "ERROR"],
-      "default": "DEBUG"
     }
   ]
 }
