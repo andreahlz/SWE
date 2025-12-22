@@ -9,8 +9,9 @@ import os
 from scipy.optimize import linear_sum_assignment
 
 def get_embedding(dna_sequences, 
-                  model,                   
-                  sample, 
+                  model,
+                  dataset,                  
+                  reads_mode, 
                   task_name="clustering",
                   post_fix="",
                   test_model_dir="./test_model"):
@@ -35,14 +36,14 @@ def get_embedding(dna_sequences,
     }
     batch_size = model2batch_size[model]
     
-    embedding_dir = f"embeddings/{species}/{task_name}_{sample}{post_fix}"
+    embedding_dir = f"embeddings/{dataset}/{task_name}_{reads_mode}{post_fix}"
     embedding_file = os.path.join(embedding_dir, model2filename[model])
     if os.path.exists(embedding_file):
         print(f"Load embedding from file {embedding_file}")
         embedding = np.load(embedding_file)
     
     else:
-        print(f"Calculate embedding for {model} {species} {sample}")
+        print(f"Calculate embedding for {model} {dataset} {reads_mode}")
         
         if model == "tnf":
             embedding = calculate_tnf(dna_sequences)

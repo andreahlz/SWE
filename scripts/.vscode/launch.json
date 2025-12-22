@@ -6,7 +6,7 @@
       "name": "Python: Debug evalclusclass",
       "type": "python",
       "request": "launch",
-      "program": "/home/barbara/evaluate/eval_clustering_classification.py",
+      "program": "${file}",
       "console": "internalConsole",
       "args": [],  // ← Explizit keine Arguments
       "justMyCode": false
