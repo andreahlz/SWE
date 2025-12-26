@@ -93,6 +93,9 @@ def calculate_tnf(dna_sequences, kernel=False):
 
     # Iterate over each sequence and update counts
     embedding = np.zeros((len(dna_sequences), len(tetra_nucleotides)))
+    #to delete
+    print(len(dna_sequences))
+    print(dna_sequences)
     for j, seq in enumerate(dna_sequences):
         for i in range(len(seq) - 3):
             tetra_nuc = seq[i:i+4]

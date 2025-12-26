@@ -14,128 +14,153 @@ from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
+import matplotlib as plt
+from sklearn.manifold import TSNE
 
-from utils import get_embedding
+from utils_changed import get_embedding
 
-csv.field_size_limit(sys.maxsize)
-csv.field_size_limit(sys.maxsize)
+# wieder dekommentieren für ABgabe
+#csv.field_size_limit(sys.maxsize)
+# csv.field_size_limit(sys.maxsize)
 
 # Set debug mode; true if args are hardcoded
 DEBUG_MODE = True
 device = "windows"
+# muss ich noch am ende rauslöschen
+if device == "windows":
+    max_c_long = 2**31 - 1   # 2147483647
+    csv.field_size_limit(max_c_long)
+
+def dimreduct_TSNE(X=np.array):
+    #todo: set perplexity to a higher value
+    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=5).fit_transform(X)
+    return X_embedded
 
 def main(args):
     model_list = args.model_list.split(",")
-    print(model_list)
     for model in model_list:
         for dataset in ["gut_microbiome_0"]: #datasets. we only got one so far
+            embeddings_all = {}
+            labels_data = {}
             for reads_mode in ["short","long"]: 
                 max_length = 10000 
-                for sample in range(args.sample_number):
-                    sample = str(sample)
+                print(f"Start {model} {dataset} {reads_mode} clustering")
+                data_file = os.path.join(args.data_dir, dataset, f"clustering_{reads_mode}.tsv")
+                                
+                with open(data_file, "r") as f:
+                    reader = csv.reader(f, delimiter="\t")
+                    data = list(reader)[1:]
+
+                dna_sequences = [d[0][:max_length] for d in data[:1000]]
+                labels = [d[1] for d in data[:1000]]
+
+
+                # convert labels to numeric values  
+                label2id = {l: i for i, l in enumerate(set(labels))}
+                labels = np.array([label2id[l] for l in labels])
+                num_clusters = len(label2id)
+                print(f"Get {len(dna_sequences)} sequences, {num_clusters} clusters")  
+                #save true ground labels for the current reads mode in the dictionary
+                #to colour the points in the visualization later
+                labels_data[f"true_ground_{reads_mode}"] = labels
+
+                # generate embedding
+                embedding = get_embedding(dna_sequences, model, dataset, reads_mode, test_model_dir=args.test_model_dir)
+                embedding_norm = normalize(embedding)
+                #use embedding_standard for t-SNE
+                embedding_standard = StandardScaler().fit_transform(embedding)
+                #reduce dimensionality of current embedding, save low dimensional embedding in dictionary
+                embedding_reduced = dimreduct_TSNE(embedding_standard)
+                embeddings_all[f"low_dim_{reads_mode}"] = embedding_reduced
+                embeddings_all[f"embedding_{reads_mode}"] = embedding
+                embeddings_all[f"embedding_standard_{reads_mode}"] = embedding_standard
+                
+                random_seeds = [0, 1, 2, 3, 4]
+                kmeans_results = np.zeros([len(random_seeds), 4])
+                lr_results = np.zeros([len(random_seeds), 5])
+                
+                for random_seed in random_seeds:
+                    ### perform k-means clustering
+                    kmeans = KMeans(n_clusters=num_clusters,
+                                    random_state=random_seed,
+                                    max_iter=1000,
+                                    init="random",
+                                    n_init=3)
+                    kmeans.fit(embedding_norm)
+                    preds_clustering = kmeans.labels_
+                    labels_data[f"kmeans_predicted_{reads_mode}"] = preds_clustering
+
+                    purity = sklearn.metrics.homogeneity_score(labels, preds_clustering)
+                    completeness = sklearn.metrics.completeness_score(labels, preds_clustering)
+                    ari = sklearn.metrics.adjusted_rand_score(labels, preds_clustering)
+                    nmi = sklearn.metrics.normalized_mutual_info_score(labels, preds_clustering)
                     
-                    print(f"Start {model} {dataset} {reads_mode} clustering")
-                    data_file = os.path.join(args.data_dir, dataset, f"clustering_{reads_mode}.tsv")
-                                    
-                    with open(data_file, "r") as f:
-                        reader = csv.reader(f, delimiter="\t")
-                        data = list(reader)[1:]
+                    kmeans_results[random_seed] = np.array([purity, completeness, ari, nmi])
+                    
+                    print(f"Kmeans purity: {purity} completeness: {completeness} ari: {ari} nmi: {nmi}")
+                    
 
-                    dna_sequences = [d[0][:max_length] for d in data[:1000]]
-                    labels = [d[1] for d in data[:1000]]
+                    # perform few-shot classification
+                    results = []
+                    
+                    # generate different train/test splits for each random seed
+                    np.random.seed(random_seed)
+                    permutation = np.random.permutation(len(labels))
+                    labels = labels[permutation]
+                    embedding_norm = embedding_norm[permutation]
+                    embedding_standard = embedding_standard[permutation]
+                    
+                    for num_samples_per_class in [1, 2, 5, 10, 20]:
+                        is_train = np.zeros(len(labels))
+                        is_test = np.zeros(len(labels))
+                        for i in range(num_clusters):
+                            idx = np.where(labels == i)[0]
+                            is_train[idx[:num_samples_per_class]] = 1
+                            is_test[idx[-80:]] = 1
+                        is_train = is_train.astype(bool)
+                        is_test = is_test.astype(bool)
+                        
+                        embedding_train = embedding_standard[is_train]
+                        embedding_test = embedding_standard[is_test]
 
-                    # convert labels to numeric values  
-                    label2id = {l: i for i, l in enumerate(set(labels))}
-                    labels = np.array([label2id[l] for l in labels])
-                    num_clusters = len(label2id)
-                    print(f"Get {len(dna_sequences)} sequences, {num_clusters} clusters")   
-
-                    # generate embedding
-                    embedding = get_embedding(dna_sequences, model, dataset, sample, test_model_dir=args.test_model_dir)
-                    embedding_norm = normalize(embedding)
-                    #use embedding_standard for t-SNE
-                    embedding_standard = StandardScaler().fit_transform(embedding)
+                        # 1. Logistic Regression
+                        lr = LogisticRegression(random_state=random_seed, 
+                                                max_iter=3000, 
+                                                n_jobs=64,
+                                                solver="lbfgs",
+                                                penalty="l2",
+                                                C=0.5)
+                        lr.fit(embedding_train, labels[is_train])
+                        preds_lr = lr.predict(embedding_test)
+                        preds_train_lr = lr.predict(embedding_train)
+                        
+                        f1_train = sklearn.metrics.f1_score(labels[is_train], preds_train_lr, average="macro", zero_division=0)
+                        loss_train = sklearn.metrics.log_loss(labels[is_train], lr.predict_proba(embedding_train))
+                                        
+                        f1 = sklearn.metrics.f1_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                        recall = sklearn.metrics.recall_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                        precision = sklearn.metrics.precision_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                        accuracy = sklearn.metrics.accuracy_score(labels[is_test], preds_lr)
+                        results.append(f1)
+                        print(f"LR {num_samples_per_class}  train f1: {f1_train} loss: {loss_train} f1: {f1} recall: {recall} precision: {precision} accuracy: {accuracy}")
+                    lr_results[random_seed] = np.array(results)
+                
+                kmeans_results = kmeans_results.mean(axis=0)
+                print(f"Kmeans purity: {kmeans_results[0]} completeness: {kmeans_results[1]} ari: {kmeans_results[2]} nmi: {kmeans_results[3]}")
+                
+                lr_results = lr_results.mean(axis=0)
+                lr_results = ", ".join([str(round(r, 6)) for r in lr_results])
+                print(f"LR 1: {lr_results[0]} 2: {lr_results[1]} 5: {lr_results[2]} 10: {lr_results[3]} 20: {lr_results[4]}")
+                print(lr_results)
+            #visualization of embeddings
+            #convert labels into colors
+            colors = np.linspace(0,1,num_clusters)
+            colors_datapoints = {}
+            for l in labels_data:
+                print(l)
 
                     
-                    random_seeds = [0, 1, 2, 3, 4]
-                    kmeans_results = np.zeros([len(random_seeds), 4])
-                    lr_results = np.zeros([len(random_seeds), 5])
-                    
-                    for random_seed in random_seeds:
-                        ### perform k-means clustering
-                        kmeans = KMeans(n_clusters=num_clusters,
-                                        random_state=random_seed,
-                                        max_iter=1000,
-                                        init="random",
-                                        n_init=3)
-                        kmeans.fit(embedding_norm)
-                        preds_clustering = kmeans.labels_
-
-
-                        purity = sklearn.metrics.homogeneity_score(labels, preds_clustering)
-                        completeness = sklearn.metrics.completeness_score(labels, preds_clustering)
-                        ari = sklearn.metrics.adjusted_rand_score(labels, preds_clustering)
-                        nmi = sklearn.metrics.normalized_mutual_info_score(labels, preds_clustering)
-                        
-                        kmeans_results[random_seed] = np.array([purity, completeness, ari, nmi])
-                        
-                        print(f"Kmeans purity: {purity} completeness: {completeness} ari: {ari} nmi: {nmi}")
-                        
-
-                        # perform few-shot classification
-                        results = []
-                        
-                        # generate different train/test splits for each random seed
-                        np.random.seed(random_seed)
-                        permutation = np.random.permutation(len(labels))
-                        labels = labels[permutation]
-                        embedding_norm = embedding_norm[permutation]
-                        embedding_standard = embedding_standard[permutation]
-                        
-                        for num_samples_per_class in [1, 2, 5, 10, 20]:
-                            is_train = np.zeros(len(labels))
-                            is_test = np.zeros(len(labels))
-                            for i in range(num_clusters):
-                                idx = np.where(labels == i)[0]
-                                is_train[idx[:num_samples_per_class]] = 1
-                                is_test[idx[-80:]] = 1
-                            is_train = is_train.astype(bool)
-                            is_test = is_test.astype(bool)
-                            
-                            embedding_train = embedding_standard[is_train]
-                            embedding_test = embedding_standard[is_test]
-
-                            # 1. Logistic Regression
-                            lr = LogisticRegression(random_state=random_seed, 
-                                                    max_iter=3000, 
-                                                    n_jobs=64,
-                                                    solver="lbfgs",
-                                                    penalty="l2",
-                                                    C=0.5)
-                            lr.fit(embedding_train, labels[is_train])
-                            preds_lr = lr.predict(embedding_test)
-                            preds_train_lr = lr.predict(embedding_train)
-                            
-                            f1_train = sklearn.metrics.f1_score(labels[is_train], preds_train_lr, average="macro", zero_division=0)
-                            loss_train = sklearn.metrics.log_loss(labels[is_train], lr.predict_proba(embedding_train))
-                                            
-                            f1 = sklearn.metrics.f1_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                            recall = sklearn.metrics.recall_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                            precision = sklearn.metrics.precision_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                            accuracy = sklearn.metrics.accuracy_score(labels[is_test], preds_lr)
-                            results.append(f1)
-                            print(f"LR {num_samples_per_class}  train f1: {f1_train} loss: {loss_train} f1: {f1} recall: {recall} precision: {precision} accuracy: {accuracy}")
-                            
-                        
-                        lr_results[random_seed] = np.array(results)
-                    
-                    kmeans_results = kmeans_results.mean(axis=0)
-                    print(f"Kmeans purity: {kmeans_results[0]} completeness: {kmeans_results[1]} ari: {kmeans_results[2]} nmi: {kmeans_results[3]}")
-                    
-                    lr_results = lr_results.mean(axis=0)
-                    lr_results = ", ".join([str(round(r, 6)) for r in lr_results])
-                    print(f"LR 1: {lr_results[0]} 2: {lr_results[1]} 5: {lr_results[2]} 10: {lr_results[3]} 20: {lr_results[4]}")
-                    print(lr_results)
+                
 
 if __name__ == "__main__":
     if DEBUG_MODE:
@@ -150,8 +175,8 @@ if __name__ == "__main__":
         )
     if DEBUG_MODE and device == "windows":
         args = argparse.Namespace(
-            test_model_dir = "C:\Users\barba\Desktop\Bioinformatik\DNABERT-S",
-            data_dir="C:\Users\barba\SWE\data\DNABERTS_input",
+            test_model_dir = Path(r"C:\Users\barba\Desktop\Bioinformatik\DNABERT-S\DNABERT-S"),
+            data_dir=Path(r"C:\Users\barba\SWE\data\DNABERTS_input"),
             model_list="tnf, test",
             #added sample size
             sample_size=1
@@ -163,7 +188,7 @@ if __name__ == "__main__":
         parser.add_argument('--data_dir', type=str, default="/root/data", help='Data directory')
         # added sample size
         parser.add_argument('--sample_number', type=int, default=1, help='Number of samples to evaluate')
-    args = parser.parse_args()
+        args = parser.parse_args()
     print(args)
     print(type(args))
     main(args) 
