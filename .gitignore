@@ -145,8 +145,20 @@ env.bak/
 venv.bak/
 
 # FASTQ, tmp, vcf
-*.fastq
 *.tmp*
 *.vcf
+*.tsv
+*.bin
+bert_layers.py
+bert_padding.py
+config.json
+configuration_bert.py
+fash_attn_triton.py
+pytorch_model.bin
+special_tokens_map.json
+tokenizer.json
+tokenizer_config.json
+.DS:Store
+
 
 

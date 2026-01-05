@@ -135,17 +135,11 @@ def main(args):
                 print(lr_results)
 
 if __name__ == "__main__":
-    if DEBUG_MODE:
-        args = argparse.Namespace(
-            test_model_dir = "/home/barbara/evaluate/DNABERT-S",
-            data_dir="/home/barbara/evaluate/dnabert-s_eval",
-            model_list="tnf, test"
-        )
-    else:
-        parser = argparse.ArgumentParser(description='Evaluate clustering')
-        parser.add_argument('--test_model_dir', type=str, default="/root/trained_model", help='Directory to save trained models to test')
-        parser.add_argument('--model_list', type=str, default="tnf, test", help='List of models to evaluate, separated by comma. Currently support [tnf, tnf-k, dnabert2, hyenadna, nt, test]')
-        parser.add_argument('--data_dir', type=str, default="/root/data", help='Data directory')
+    parser = argparse.ArgumentParser(description='Evaluate clustering')
+    parser.add_argument('--test_model_dir', type=str, default="/root/trained_model", help='Directory to save trained models to test')
+    parser.add_argument('--model_list', type=str, default="tnf, test", help='List of models to evaluate, separated by comma. Currently support [tnf, tnf-k, dnabert2, hyenadna, nt, test]')
+    parser.add_argument('--data_dir', type=str, default="/root/data", help='Data directory')
+    args = parser.parse_args()
     print(args)
     print(type(args))
     main(args) 
