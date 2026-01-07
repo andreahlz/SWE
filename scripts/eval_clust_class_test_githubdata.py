@@ -39,13 +39,13 @@ def dimreduct_TSNE(X=np.array):
 def main(args):
     model_list = args.model_list.split(",")
     for model in model_list:
-        for dataset in ["marine","plant"]: #datasets. we only got one so far
+        for dataset in ["reference","marine","plant"]: #datasets. we only got one so far
             embeddings_all = {}
             labels_data = {}
             colors_datapoints = {}
             ARI = {}
             for reads_mode in [0,1,2,3,4]: 
-                max_length = 10000 if dataset == "reference" else 20000
+                max_length = 10 if dataset == "reference" else 20
                 print(f"Start {model} {dataset} {reads_mode} clustering")
                 data_file = os.path.join(args.data_dir, dataset, f"clustering_{reads_mode}.tsv")
                                 
@@ -114,40 +114,40 @@ def main(args):
                     embedding_norm = embedding_norm[permutation]
                     embedding_standard = embedding_standard[permutation]
                     
-                    for num_samples_per_class in [1, 2, 5, 10, 20]:
-                    #for num_samples_per_class in [2, 5, 20]: # for quick testing, delete later todo
-                        is_train = np.zeros(len(labels))
-                        is_test = np.zeros(len(labels))
-                        for i in range(num_clusters):
-                            idx = np.where(labels == i)[0]
-                            is_train[idx[:num_samples_per_class]] = 1
-                            is_test[idx[-80:]] = 1
-                        is_train = is_train.astype(bool)
-                        is_test = is_test.astype(bool)
+                    # for num_samples_per_class in [1, 2, 5, 10, 20]:
+                    # #for num_samples_per_class in [2, 5, 20]: # for quick testing, delete later todo
+                    #     is_train = np.zeros(len(labels))
+                    #     is_test = np.zeros(len(labels))
+                    #     for i in range(num_clusters):
+                    #         idx = np.where(labels == i)[0]
+                    #         is_train[idx[:num_samples_per_class]] = 1
+                    #         is_test[idx[-80:]] = 1
+                    #     is_train = is_train.astype(bool)
+                    #     is_test = is_test.astype(bool)
                         
-                        embedding_train = embedding_standard[is_train]
-                        embedding_test = embedding_standard[is_test]
+                    #     embedding_train = embedding_standard[is_train]
+                    #     embedding_test = embedding_standard[is_test]
 
-                        # 1. Logistic Regression
-                        lr = LogisticRegression(random_state=random_seed, 
-                                                max_iter=3000, 
-                                                n_jobs=64,
-                                                solver="lbfgs",
-                                                penalty="l2",
-                                                C=0.5)
-                        lr.fit(embedding_train, labels[is_train])
-                        preds_lr = lr.predict(embedding_test)
-                        preds_train_lr = lr.predict(embedding_train)
+                    #     # 1. Logistic Regression
+                    #     lr = LogisticRegression(random_state=random_seed, 
+                    #                             max_iter=3000, 
+                    #                             n_jobs=64,
+                    #                             solver="lbfgs",
+                    #                             penalty="l2",
+                    #                             C=0.5)
+                    #     lr.fit(embedding,ax = plt.subplots(3,5, figsize=(18,12))g_train, labels[is_train])
+                    #     preds_lr = lr.predict(embedding_test)
+                    #     preds_train_lr = lr.predict(embedding_train)
                         
-                        f1_train = sklearn.metrics.f1_score(labels[is_train], preds_train_lr, average="macro", zero_division=0)
-                        loss_train = sklearn.metrics.log_loss(labels[is_train], lr.predict_proba(embedding_train))
+                    #     f1_train = sklearn.metrics.f1_score(labels[is_train], preds_train_lr, average="macro", zero_division=0)
+                    #     loss_train = sklearn.metrics.log_loss(labels[is_train], lr.predict_proba(embedding_train))
                                         
-                        f1 = sklearn.metrics.f1_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                        recall = sklearn.metrics.recall_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                        precision = sklearn.metrics.precision_score(labels[is_test], preds_lr, average="macro", zero_division=0)
-                        accuracy = sklearn.metrics.accuracy_score(labels[is_test], preds_lr)
-                        results.append(f1)
-                        print(f"LR {num_samples_per_class}  train f1: {f1_train} loss: {loss_train} f1: {f1} recall: {recall} precision: {precision} accuracy: {accuracy}")
+                    #     f1 = sklearn.metrics.f1_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                    #     recall = sklearn.metrics.recall_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                    #     precision = sklearn.metrics.precision_score(labels[is_test], preds_lr, average="macro", zero_division=0)
+                    #     accuracy = sklearn.metrics.accuracy_score(labels[is_test], preds_lr)
+                    #     results.append(f1)
+                    #     print(f"LR {num_samples_per_class}  train f1: {f1_train} loss: {loss_train} f1: {f1} recall: {recall} precision: {precision} accuracy: {accuracy}")
                     #todo: decomment later
                     #lr_results[random_seed] = np.array(results)
                 
@@ -162,15 +162,15 @@ def main(args):
                     print("test truth value calculation")
                     truth_value = [0 if labels_data[f"true_ground_{dataset}_{reads_mode}"][i] != labels_data[f"kmeans_predicted_{dataset}_{reads_mode}"][i] else 1 for i in range(len(labels_data[f"true_ground_{dataset}_{reads_mode}"]))]
                     colors_datapoints[f"{dataset}_{reads_mode}_labels_correct_predicted"] = ["green" if truth_value[i] == 1 else "red" for i in range(len(truth_value))]
-            
+            print("test")
             #visualization of embeddings
             #convert labels into colors
             colors = np.linspace(0,1,num_clusters)
             for l in labels_data.keys():
                 labels_norm = [i/(num_clusters-1) for i in labels_data[l]]
                 colors_datapoints[l] = plt.cm.viridis(labels_norm)
-            fig,ax = plt.subplots(2,3, figsize=(18,12))
-            for dataset in ["marine", "plant"]:
+            for dataset in ["reference","marine", "plant"]:
+                fig,ax = plt.subplots(4,3, figsize=(18,12))
                 for ind,reads_mode in enumerate([0,1,2,3,4]):
                     titles = ["Kmeans predicted clustering", "True ground clustering", "Kmeans predicted clustering with correct/incorrect labels"]
                     datapoints_labels = [f"kmeans_predicted_{dataset}_{reads_mode}", f"true_ground_{dataset}_{reads_mode}", f"{dataset}_{reads_mode}_labels_correct_predicted"]
