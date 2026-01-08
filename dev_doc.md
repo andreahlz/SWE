@@ -7,7 +7,7 @@
 
 ## NOTE neue eintrage über den alten (dann müssen wir nicht das ganze doc durchscrollen)
 
-### update: pull request chnages von 13.12.2025
+### update: pull request changes von 13.12.2025
 
 files changed:
 - enviroment.yml
@@ -19,7 +19,7 @@ new files:
 - test_abbundance.txt 
 - multifasta\test_mock_gut_genomes.fna
 
-info on chnages:
+info on changes:
 - enviroment.yml
     enviroment.yml erstellt auf LISC deshalb pakete linux-spezifisch -> funktioniert nur auf linux enviroment. für windows nur nutzung mit zb wsl
     tasuch von reinfolge von channels wiel conda-forge größer ist zuerst also conda-forge 20000 packages und bioconda 8000 -> reihnfolge nach prioriät und großre und conda-forge hat oft neuere versionen als bioconda
@@ -46,4 +46,20 @@ info on chnages:
     um zu sehen das simulation functioniert
     simulation funktioniert 
     zwei fastq files werden erstellt
+
+
+
+### update: pull request changes von 13.12.2025
+
+files changed:
+- config.env
+
+new files:
+- simulate_long_reads.sh
+
+info on changes:
+- config.env:
+  added paragraph: #badread parameters
+  
+
 
