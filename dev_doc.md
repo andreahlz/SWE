@@ -60,6 +60,14 @@ new files:
 info on changes:
 - config.env:
   added paragraph: #badread parameters
-  
+
+
+Added to LiSC manually:
+- genome_multifasta="data/genomes/multifasta/test_mock_gut_genomes.fna"
+- abundance_file="data/abundances/test_abbundance.txt"
+- long_reads_file = "data/scripts/simulate_long_reads.sh"
+- "config-env"
+Manually because of git permission issues 
+
 
 
