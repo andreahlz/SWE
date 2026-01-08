@@ -7,7 +7,7 @@
 
 ## NOTE neue eintrage über den alten (dann müssen wir nicht das ganze doc durchscrollen)
 
-### update: pull request changes von 13.12.2025
+### update: pull request changes von 08.01.2026
 
 files changed:
 - enviroment.yml
@@ -68,6 +68,7 @@ Added to LiSC manually:
 - long_reads_file = "data/scripts/simulate_long_reads.sh"
 - "config-env"
 Manually because of git permission issues 
+
 
 
 
