@@ -1,7 +1,20 @@
 #!/usr/bin/env nextflow
 
+process get_n_lines_of_tsv{
+    publishDir "${projectDir.parent}/data/tsvs",mode:'copy'
+
+    input:
+        file tsv_file
+    output:
+        file "${tsv_file.baseName}_processed.tsv"
+    script:
+    """
+    echo "${projectDir.parent}/data/tsvs"
+    head ${tsv_file} -n 65000 > ${tsv_file.baseName}_processed.tsv
+    """
+}
 process calculate_embeddings{
-    publishDir "data/embeddings/${tsv_file.baseName}",mode:'copy'
+    publishDir "${projectDir.parent}/data/embeddings/${tsv_file.baseName}",mode:'copy'
 
     input:
         file tsv_file
@@ -12,7 +25,6 @@ process calculate_embeddings{
         path "data/csv_embeddings/${tsv_file.baseName}_stand.csv"
     script:
     """
-    echo "${tsv_file}"
     mkdir "data/embeddings/${tsv_file.baseName}" -p
     mkdir "data/csv_embeddings"
     python3 ${py_script}\
@@ -32,6 +44,6 @@ workflow{
     only_tsvs = file("${data_dir}/tsvs/*.tsv")
     println only_tsvs
     tsv_files = channel.fromPath("${data_dir}/tsvs/*.tsv")
-    calculate_embeddings(tsv_files,"${projectDir}/calculate_embedding_for_tsv.py","/home/barbara/evaluate/DNABERT-S")
-
+    get_n_lines_of_tsv(tsv_files)
+    calculate_embeddings(get_n_lines_of_tsv.out,"${projectDir}/calculate_embedding_for_tsv.py","/home/barbara/evaluate/DNABERT-S")
 }
