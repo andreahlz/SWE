@@ -24,7 +24,7 @@ from utils_changed import get_embedding
 # csv.field_size_limit(sys.maxsize)
 
 # Set debug mode; true if args are hardcoded
-DEBUG_MODE = True
+DEBUG_MODE = False
 device = "linux"
 # muss ich noch am ende rauslöschen
 if device == "windows":
@@ -36,19 +36,21 @@ def dimreduct_TSNE(X=np.array):
     #run it several times, find the value, where kl divergence does not improve any more (KL divergence low indicates better results)
     #perplexity sets the effective number of neighbours that each point is attracted to
     #Kullback-Leibler (KL) divergence is a measure of the difference between two probability distributions (low and high dimensional)
-    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=100).fit_transform(X)
+    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=2).fit_transform(X)
     return X_embedded
 
 def main(args):
     model_list = args.model_list.split(",")
     for model in model_list:
-        for dataset in ["gut_microbiome_2"]: #datasets. we only got one so far
+        print(args.data_dir)
+        for dataset in os.listdir(args.data_dir): #datasets. we only got one so far
+            print(os.listdir(args.data_dir))
             embeddings_all = {}
             labels_data = {}
             colors_datapoints = {}
-            for reads_mode in ["all_tsvs_combined"]: 
+            for reads_mode in ["all_tsvs"]: 
                 print(f"Start {model} {dataset} {reads_mode} clustering")
-                data_file = os.path.join(args.data_dir, dataset, f"clustering_{reads_mode}.tsv")
+                data_file = os.path.join(args.data_dir, dataset, f"{reads_mode}.tsv")
                                 
                 with open(data_file, "r") as f:
                     reader = csv.reader(f, delimiter="\t")
@@ -171,8 +173,9 @@ def main(args):
             for l in labels_data.keys():
                 labels_norm = [i/(num_clusters-1) for i in labels_data[l]]
                 colors_datapoints[l] = plt.cm.viridis(labels_norm)
+            print(embeddings_all.keys())
             fig,ax = plt.subplots(2,3, figsize=(18,12))
-            for ind,reads_mode in enumerate(["all_tsvs_combined"]):
+            for ind,reads_mode in enumerate(["all_tsvs"]):
                 titles = ["Kmeans predicted clustering", "True ground clustering", "Kmeans predicted clustering with correct/incorrect labels"]
                 datapoints_labels = [f"kmeans_predicted_{reads_mode}", f"true_ground_{reads_mode}", f"{reads_mode}_labels_correct_predicted"]
                 for i in range(3):
@@ -181,6 +184,7 @@ def main(args):
                     ax[ind,i].scatter(dim1,dim2,c=colors_datapoints[datapoints_labels[i]])
                     if ind == 0:
                         ax[ind,i].set_title(titles[i])
+            plt.savefig("embeddings_visualization.png")
             plt.show()
             #plot for both short and long reads
         print("test")
@@ -189,6 +193,7 @@ def main(args):
                 
 
 if __name__ == "__main__":
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
     if DEBUG_MODE:
         #muss ich noch ausbauen
         proj_root = Path(__file__).parent.parent
