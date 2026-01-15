@@ -14,7 +14,7 @@ process get_n_lines_of_tsv{
     """
 }
 process calculate_embeddings{
-    publishDir "${projectDir.parent}/data/embeddings/${tsv_file.baseName}",mode:'copy'
+    publishDir "${projectDir.parent}/data/csv_embeddings",mode:'copy'
 
     input:
         file tsv_file
@@ -25,8 +25,8 @@ process calculate_embeddings{
         path "data/csv_embeddings/${tsv_file.baseName}_stand.csv"
     script:
     """
-    mkdir "data/embeddings/${tsv_file.baseName}" -p
-    mkdir "data/csv_embeddings"
+    mkdir "data/csv_embeddings" -p
+
     python3 ${py_script}\
             --tsv_file_path=${tsv_file}\
             --test_model_dir=${path_model_dir}\
@@ -37,6 +37,23 @@ process calculate_embeddings{
 /missing: process to combine embeddings, TSNe on these,
 /set argument path_model_dir such that it finds the model
 /*/
+process combine_embeddings{
+    publishDir "${projectDir.parent}/data/commbined_embedings",mode:'copy' 
+
+    input:
+        path csv_files
+        path py_script
+    output:
+        path "data/commbined_embedings/combined_embeddings.csv"
+        path "data/commbined_embedings/combined_embeddings_stand.csv"
+    script:
+    """
+    mkdir "data/combined_embeddings" -p
+    python3 ${py_script} ${projectDir.parent}/data/csv_embeddings .
+        
+    """
+}
+
 workflow{
     println projectDir
     data_dir = "${projectDir.parent}/data"
