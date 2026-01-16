@@ -48,11 +48,7 @@ def main(args):
         embedding_standard = StandardScaler().fit_transform(embedding)
         #converts the values of the embedding into differences to the mean in standard deviations
         #reduce dimensionality of current embedding, save low dimensional embedding in dictionary
-
-        #converting embeddings to strings without []
-        emebdding_string = [' '.join(map(str,emb)) for emb in embedding]
-        
-        df_embedding = pd.DataFrame({
+        '''df_embedding = pd.DataFrame({
                 'embedding':list(embedding),
                 'labels':labels
             })
@@ -62,7 +58,16 @@ def main(args):
         })
         df_embedding.to_csv(f"data/csv_embeddings/{Path(tsv_file).stem}.csv",header=False,index=False)
         df_emb_stand.to_csv(f"data/csv_embeddings/{Path(tsv_file).stem}_stand.csv",header=False,index=False)
-        print("test")
+        print("test")'''
+        #instead of csv using npy
+
+        output_dir = "data/csv_embeddings"
+        os.makedirs(output_dir, exist_ok=True)
+        base_name = Path(tsv_file).stem
+        np.save(f"{output_dir}/{base_name}_emb.npy",  embedding)
+        np.save(f"{output_dir}/{base_name}_emb_stand.npy", embedding_standard)
+        with open(f"{output_dir}/{base_name}_labels.txt", 'w') as f:
+            f.write('\n'.join(labels))
 
 if __name__ == "__main__":
     os.environ["TOKENIZERS_PARALLELISM"] = "false"

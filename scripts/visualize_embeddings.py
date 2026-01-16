@@ -11,30 +11,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
-def load_embeddings_from_csv(csv_file):
-
-    '''
-    load combined embeddings (CSV)
-    Note: how to best handle embeddings?
-
-    INPUT FORMAT NOW:
-        Column 0: embedding as string "[0.1, 0.2, ...]"
-        Column 1: label (species name)
-    '''
-    df = pd.read_csv(csv_file, header = None)
-    embeddings_str = df[0].values 
-    labels = df[1].values
-
-    embeddings = []
-    for emb_str in embeddings_str:
-        #remove brackets nad parse to numpy array
-        emb_str = emb_str.strip('[]')
-        emb = np.fromstring(emb_str, sep= ' ')
-        embeddings.append(emb)
-
-    embeddings = np.array(embeddings)
-
-    return embeddings,labels
+def load_embeddings_from_npy(npy_file,label_file):
+    embeddings = np.load(npy_file)
+    with open(label_file, 'r') as f:
+        labels = f.read().strip().split('\n')
+    return embeddings, labels
 
 def load_clustering_results(clustering_csv_file):
     #loads k-means clustering reuslts
@@ -106,7 +87,7 @@ def create_visualization(embeddings_2d,true_labels,predicted_labels, output_file
 
 def main(args):
     # Load standardized embeddings (for t-SNE)
-    embeddings_std,labels = load_embeddings_from_csv(args.embeddings_file)
+    embeddings_std,labels = load_embeddings_from_npy(args.embedding_file,args.label_file)
 
 
     # Load clustering results
@@ -120,7 +101,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Visualize embeddings with t-sne')
-    parser.add_argument('--embeddings_file',type=str, required=True,help='Path to combined_embeddings_stand.csv(standardized)')
+    parser.add_argument('--embedding_file',type=str, required=True,help='Path to combined_embeddings_stand.npy(standardized)')
+    parser.add_argument('--label_file',type=str, required=True,help='Path to combined_labels_stand.txt')
     parser.add_argument('--clustering_file',type=str, required=True,help='Path to kmeans_results.csv')
     parser.add_argument('--output_file',type=str, required=True,help='Path to save visualization PNG')
     args = parser.parse_args()
