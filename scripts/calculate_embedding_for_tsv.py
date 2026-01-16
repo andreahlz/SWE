@@ -48,6 +48,10 @@ def main(args):
         embedding_standard = StandardScaler().fit_transform(embedding)
         #converts the values of the embedding into differences to the mean in standard deviations
         #reduce dimensionality of current embedding, save low dimensional embedding in dictionary
+
+        #converting embeddings to strings without []
+        emebdding_string = [' '.join(map(str,emb)) for emb in embedding]
+        
         df_embedding = pd.DataFrame({
                 'embedding':list(embedding),
                 'labels':labels

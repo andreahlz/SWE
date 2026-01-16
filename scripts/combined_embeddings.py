@@ -46,7 +46,7 @@ def combine_embeddings(csv_dir, output_dir):
 
 
 if __name__ == "__main__":
-    if len(sys.arg) != 3:
+    if len(sys.argv) != 3:
         sys.stderr.write("Usage: python combine_embeddings.py <csv_dir> <output_dir>\n")
         sys.exit(2)
     combine_embeddings(sys.argv[1], sys.argv[2])
