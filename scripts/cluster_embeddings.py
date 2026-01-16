@@ -14,30 +14,12 @@ import sklearn.metrics
 from sklearn.cluster import KMeans
 
 
-def load_embeddings_from_csv(csv_file):
+def load_embeddings_from_npy(npy_file,label_file):
+    embeddings = np.load(npy_file)
+    with open(label_file, 'r') as f:
+        labels = f.read().strip().split('\n')
+    return embeddings, labels
 
-    '''
-    load combined embeddings (CSV)
-    Note: how to best handle embeddings?
-
-    INPUT FORMAT NOW:
-        Column 0: embedding as string "[0.1, 0.2, ...]"
-        Column 1: label (species name)
-    '''
-    df = pd.read_csv(csv_file, header = None)
-    embeddings_str = df[0].values 
-    labels = df[1].values
-
-    embeddings = []
-    for emb_str in embeddings_str:
-        #remove brackets nad parse to numpy array
-        emb_str = emb_str.strip('[]')
-        emb = np.fromstring(emb_str, sep= ' ')
-        embeddings.append(emb)
-
-    embeddings = np.array(embeddings)
-
-    return embeddings,labels
 
 def prepare_labels(labels):
     # convert labels to numeric values  
@@ -114,7 +96,7 @@ def save_results(results, original_labels, output_file):
 
 def main(args):
     # Load data
-    embeddings, original_labels = load_embeddings_from_csv(args.embedding_file)
+    embeddings, original_labels = load_embeddings_from_npy(args.embedding_file, args.label_file)
     # Prepare labels
     labels_numeric, num_clusters,_ = prepare_labels(original_labels)
     # Clustering
@@ -128,7 +110,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='K-means clustering on combined embeddings')
     parser.add_argument('--embedding_file', type=str, required=True,
-                        help='Path to combined_embeddings.csv')
+                        help='Path to combined_embeddings.npy')
+    parser.add_argument('--label_file', type=str, required=True,
+                        help='Path to combined_labels.txt')
     parser.add_argument('--output_file', type=str, required=True,
                         help='Path to save clustering results')
     

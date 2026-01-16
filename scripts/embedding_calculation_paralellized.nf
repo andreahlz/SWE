@@ -14,18 +14,22 @@ process get_n_lines_of_tsv{
     """
 }
 process calculate_embeddings{
-    publishDir "${projectDir.parent}/data/csv_embeddings",mode:'copy'
+    publishDir "${projectDir.parent}/data/species_embeddings",mode:'copy'
 
     input:
         file tsv_file
         path py_script
         path path_model_dir
     output:
-        path "data/csv_embeddings/${tsv_file.baseName}.csv"
-        path "data/csv_embeddings/${tsv_file.baseName}_stand.csv"
+        tuple   path("data/species_embeddings/${tsv_file.baseName}_emb.npy"),
+                path("data/species_embeddings/${tsv_file.baseName}_labels.txt"),
+                emit: normal
+        tuple   path("data/species_embeddings/${tsv_file.baseName}_emb_stand.npy"),
+                path("data/species_embeddings/${tsv_file.baseName}_labels.txt"),
+                emit: standard
     script:
     """
-    mkdir -p "data/csv_embeddings" 
+    mkdir -p "data/species_embeddings" 
 
     python3 ${py_script} \
             --tsv_file_path=${tsv_file} \
@@ -42,23 +46,28 @@ process combine_embeddings{
     publishDir "${projectDir.parent}/data/combined_embeddings",mode:'copy' 
 
     input:
-        path csv_files
+        path all_files
         path py_script
     output:
-        path "combined_embeddings.csv"
-        path "combined_embeddings_stand.csv"
+        tuple   path("combined_embeddings.npy"),
+                path("combined_labels.txt"),
+                emit: normal
+        tuple   path("combined_embeddings_stand.npy"),
+                path("combined_labels_stand.txt"),
+                emit: standard
+ 
     script:
     """
     
     python3 ${py_script} \
-            ${projectDir.parent}/data/csv_embeddings \
+            ${projectDir.parent}/data/species_embeddings \
             .
     """
 }
 process kmeans_clustering{
     publishDir "${projectDir.parent}/data/clustering_results",mode:'copy' 
     input:
-        path combined_embeddings
+        tuple path(combined_embeddings_npy), path(combined_labels_txt)
         path py_script
     output:
         path "kmeans_results.csv"
@@ -67,14 +76,16 @@ process kmeans_clustering{
     """
     
     python3 ${py_script} \
-            --embedding_file=${combined_embeddings} \
+            --embedding_file=${combined_embeddings_npy} \
+            --label_file=${combined_labels_txt} \
             --output_file=kmeans_results.csv
     """
 }
+
 process visualization_embeddings{
     publishDir "${projectDir.parent}/data/visualizations",mode:'copy' 
     input:
-        path combined_embeddings_stand
+        tuple path(combined_embeddings_stand_npy), path(combined_labels_stand_txt)
         path kmeans_results
         path py_script
     output:
@@ -83,14 +94,12 @@ process visualization_embeddings{
     """
     
     python3 ${py_script} \
-            --embedding_file=${combined_embeddings_stand} \
+            --embedding_file=${combined_embeddings_stand_npy} \
+            --label_file=${combined_labels_stand_txt} \
             --clustering_file=${kmeans_results} \
             --output_file=embeddings_visualization.png
     """
 }
-
-
-
 
 workflow{
     println projectDir
@@ -106,10 +115,14 @@ workflow{
     
     calculate_embeddings(get_n_lines_of_tsv.out,"${projectDir}/calculate_embedding_for_tsv.py","/home/barbara/evaluate/DNABERT-S")
     
-    all_csv_files = calculate_embeddings.out[0].collect()
-    combine_embeddings(all_csv_files, file("${projectDir}/combine_embeddings.py"))
+    all_files = calculate_embeddings.out.normal
+        .concat(calculate_embeddings.out.standard)
+        .flatten()
+        .collect()
 
-    kmeans_clustering(calculate_embeddings.out[0], file("${projectDir}/kmeans_clustering.py"))
+    combine_embeddings(all_files, file("${projectDir}/combine_embeddings.py"))
 
-    visualization_embeddings(combine_embeddings.out[1], kmeans_clustering.out[0], file("${projectDir}/visualize_embeddings.py"))
+    kmeans_clustering(combine_embeddings.out.normal, file("${projectDir}/cluster_embeddings.py"))
+
+    visualization_embeddings(combine_embeddings.out.standard, kmeans_clustering.out[0], file("${projectDir}/visualize_embeddings.py"))
 }
