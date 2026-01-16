@@ -1,11 +1,72 @@
 # SWE Project Logbook
 
 ## NEXT TO DO:
-- how to solve abbundance when multiple sequences
-- covarage oder absolute zahl an reads oder was genau der unterschied
-- long reads sim script
+- testing pipline
+- extend pipline from fasta to results 
+- handling of embeddings currently emmebding ["string"],"lable" -> current solutuion in combined_embeddings.py and vizualisation.py -> look into better solution 
 
 ## NOTE neue eintrage über den alten (dann müssen wir nicht das ganze doc durchscrollen)
+
+### UPDATE: andrea/combine-embeddings
+
+main changes:
+- Embedding combination process
+- K-means clustering on combined embeddings
+- t-SNE visualization of clustering results
+
+files changed:
+- scripts/embedding_calculation_paralellized.nf
+- dev_doc.md
+
+new files:
+- scripts/combined_embeddings.py
+- scripts/kmeans_clustering.py
+- scripts/visualize_embeddings.py
+
+scripts/combined_embeddings.py: 
+Purpose: Combines individual species embedding CSVs into single files
+Input: Individual CSV files from calculate_embedding_for_tsv.py (per species)
+Output: 
+- combined_embeddings.csv - All embeddings combined (for K-means)
+- combined_embeddings_stand.csv - Standardized embeddings (for t-SNE)
+
+scripts/kmeans_clustering.py
+Purpose: Perform K-means clustering on combined embeddings
+Input: combined_embeddings.csv
+Output:
+- kmeans_results.csv - True labels + Predicted cluster IDs
+- kmeans_results_metrics.txt - Clustering quality metrics
+script based on eval_clustering_classification_changed.py main diff is adaption of funtions for nextflow pipline
+short summary:
+- K-means algorithm & parameters
+- Multiple random seeds (0-4) for robustness
+- Metrics calculation: Purity, Completeness, ARI, NMI
+- Label preparation (string → numeric conversion)
+- CSV input/output
+
+scripts/visualize_embeddings.py
+Purpose: t-SNE visualization of embeddings with clustering results
+Input:
+combined_embeddings_stand.csv - Standardized embeddings
+kmeans_results.csv - Clustering results
+Output:
+embeddings_visualization.png - Three-panel plot
+
+scripts/embedding_calculation_paralellized.nf
+Changes: Extended workflow with three new processes
+
+Current Nextflow Pipline
+TSV files
+  ↓ (parallel!)
+Calculate embeddings (parallel per species)
+  ↓
+Combine embeddings 
+  ↓
+K-means clustering 
+  ↓
+t-SNE visualization 
+  ↓
+PNG output + CSV results + metrics file
 
 ### update: pull request changes von 08.01.2026
 

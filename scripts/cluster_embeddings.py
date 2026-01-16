@@ -90,8 +90,8 @@ def save_results(results, original_labels, output_file):
 
     #CSV with results
     output_df = pd.DataFrame({
-        'true_lable':original_labels,
-        'predicted_lables': best_result['predicted_labels']
+        'true_label':original_labels,
+        'predicted_labels': best_result['predicted_labels']
     })
 
     os.makedirs(os.path.dirname(output_file) or '.', exist_ok=True)

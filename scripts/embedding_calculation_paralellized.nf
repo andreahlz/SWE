@@ -71,6 +71,24 @@ process kmeans_clustering{
             --output_file=kmeans_results.csv
     """
 }
+process visualization_embeddings{
+    publishDir "${projectDir.parent}/data/visualizations",mode:'copy' 
+    input:
+        path combined_embeddings_stand
+        path kmeans_results
+        path py_script
+    output:
+        path "embeddings_visualization.png"
+    script:
+    """
+    
+    python3 ${py_script} \
+            --embedding_file=${combined_embeddings_stand} \
+            --clustering_file=${kmeans_results} \
+            --output_file=embeddings_visualization.png
+    """
+}
+
 
 
 
@@ -92,4 +110,6 @@ workflow{
     combine_embeddings(all_csv_files, file("${projectDir}/combine_embeddings.py"))
 
     kmeans_clustering(calculate_embeddings.out[0], file("${projectDir}/kmeans_clustering.py"))
+
+    visualization_embeddings(combine_embeddings.out[1], kmeans_clustering.out[0], file("${projectDir}/visualize_embeddings.py"))
 }
