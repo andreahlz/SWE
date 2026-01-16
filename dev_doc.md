@@ -57,15 +57,15 @@ Changes: Extended workflow with three new processes
 
 Current Nextflow Pipline
 TSV files
-  ↓ (parallel!)
+-> 
 Calculate embeddings (parallel per species)
-  ↓
+-> 
 Combine embeddings 
-  ↓
+-> 
 K-means clustering 
-  ↓
+-> 
 t-SNE visualization 
-  ↓
+-> 
 PNG output + CSV results + metrics file
 
 ### update: pull request changes von 08.01.2026
@@ -129,6 +129,7 @@ Added to LiSC manually:
 - long_reads_file = "data/scripts/simulate_long_reads.sh"
 - "config-env"
 Manually because of git permission issues 
+
 
 
 
