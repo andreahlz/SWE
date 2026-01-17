@@ -61,7 +61,7 @@ def main(args):
         print("test")'''
         #instead of csv using npy
 
-        output_dir = "data/csv_embeddings"
+        output_dir = "data/species_embeddings"
         os.makedirs(output_dir, exist_ok=True)
         base_name = Path(tsv_file).stem
         np.save(f"{output_dir}/{base_name}_emb.npy",  embedding)
