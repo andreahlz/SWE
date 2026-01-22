@@ -70,5 +70,46 @@ Added to LiSC manually:
 Manually because of git permission issues 
 
 
+### update: 21.1 and 22.1.
+files changed: 
+- config.env
+
+new scripts:
+- download_genomes.py
+- process_genomes.py
+
+deleted scripts:
+- genomes_download.py
+
+info on changes:
+- config.env:
+  added paragraphs: 
+    - genome download parameters
+    - genome processing parameters
+    - adjusted genome_multifasta
+    - adjusted abundance_file 
+- download_genomes vs genomes_download
+  new script 
+    - doesnt have hardcoded paths -> config.env
+    - keeps the output files separate -> doesnt combine them into multi fasta file
+- process_genomes.py
+  workflow:
+    - Reads abundance values from your input.txt
+    - For each .fna file in data/genomes/processed:
+        - Extracts all headers
+        - Combines multiple sequences into one long sequence
+        - Creates new file with just the Accession ID as header
+        - Saves to data/genomes/processed/newheader/
+    - Creates a CSV file (header_info.csv) with:
+        - Accession ID
+        - Original headers (separated by semicolons if multiple)
+        - Abundance value
+    - Combines all processed files into one multi-fasta file
+  output:
+    - new folder: data/genomes/processed/newheader/
+    - separate .fna files with new header (data/genomes/processed/newheader)
+    - header_info_csv file (data/genomes)
+    - combined_genomes.fna (data/genomes)
+
 
 

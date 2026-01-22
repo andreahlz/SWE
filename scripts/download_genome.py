@@ -73,12 +73,12 @@ def download_genome(accession, output_dir, timeout):
 
 def main():
     # Load configuration
-    config = dotenv_values("config.env")
+    config = dotenv_values("../config.env")
     
-    # Get parameters from config
-    input_file = Path(config.get("input_file", "input.txt"))
-    output_dir = Path(config.get("genome_output_dir", "data/genomes/processed"))
-    timeout = int(config.get("download_timeout", "300"))
+    # Get parameters from config (adjust paths to be relative to project root)
+    input_file = Path("..") / config["input_file"]
+    output_dir = Path("..") / config["genome_output_dir"]
+    timeout = int(config["download_timeout"])
     
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
