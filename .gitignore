@@ -14,6 +14,9 @@ data_test
 .nextflow.log*
 work/
 
+#dnaberts
+DNABERT-S
+
 # Distribution / packaging
 .Python
 build/
