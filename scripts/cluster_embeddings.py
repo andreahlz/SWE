@@ -62,7 +62,7 @@ def perform_kmeans(embeddings, labels, num_clusters, random_seeds=[0, 1, 2, 3, 4
 def calculate_mean_results(results):
     metrics = ['purity', 'completeness','ari','nmi']
     mean_results = {
-        metric: np.mean(r[metric] for r in results)
+        metric: np.mean([r[metric] for r in results])
         for metric in metrics
     }
     return mean_results
@@ -88,7 +88,6 @@ def save_results(results, original_labels, output_file):
         f.write(f"ARI: {best_result['ari']:.4f}\n")
         f.write(f"Purity: {best_result['purity']:.4f}\n")
         f.write(f"Completeness: {best_result['completeness']:.4f}\n")
-        f.write(f"purity: {best_result['purity']:.4f}\n")
         f.write("Mean Results (across all seeds):\n")
         for metric in ['purity', 'completeness', 'ari', 'nmi']:
             f.write(f"  {metric.capitalize():13s}: {mean_results[metric]:.4f}\n")
@@ -110,9 +109,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='K-means clustering on combined embeddings')
     parser.add_argument('--embedding_file', type=str, required=True,
-                        help='Path to combined_embeddings.npy')
+                        help='Path to embeddings.npy')
     parser.add_argument('--label_file', type=str, required=True,
-                        help='Path to combined_labels.txt')
+                        help='Path to labels.txt')
     parser.add_argument('--output_file', type=str, required=True,
                         help='Path to save clustering results')
     
