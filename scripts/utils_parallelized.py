@@ -34,10 +34,11 @@ def get_embedding(dna_sequences,
         "nt": 64,
         "test": 20,
     }
+
     batch_size = model2batch_size[model]
     tsv_stem =os.path.basename(tsv_file).split(".")[0]
-    embedding_dir = f"data/embeddings/{post_fix}"
-    embedding_file = os.path.join(embedding_dir,tsv_stem, model2filename[model])
+    embedding_dir = os.path.join(path_data_dir, "embeddings",post_fix,tsv_stem)
+    embedding_file = os.path.join(embedding_dir, model2filename[model])
     print("tsv_stem:",tsv_stem)
     print("embedding_dir:",embedding_dir)
     if os.path.exists(embedding_file):
