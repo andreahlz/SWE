@@ -4,10 +4,10 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="${script_dir%/scripts}"
 
-# Source config file
+
 source "${project_root}/config.env"
 
-# Set paths using config variables
+
 genome_input_file="${project_root}/${genome_multifasta}"
 abundance_input_file="${project_root}/${abundance_file}"
 output_dir="${project_root}/${out_dir_longreads}"
@@ -21,8 +21,8 @@ mkdir -p "${temp_dir}"
 # Read abundances
 declare -A abundances
 while IFS=$'\t' read -r species abundance; do
-    [[ "$species" == "species" ]] && continue  # Skip header
-    abundances["$species"]=$abundance
+    [[ "$Accession_ID" == "Accession_ID" ]] && continue  # Skip header
+    abundances["$Accession_ID"]=$abundance
 done < "${abundance_input_file}"
 
 # Split multifasta into individual genomes
@@ -58,7 +58,7 @@ for genome_file in "${temp_dir}"/*.fna; do
         --length ${mean_length},${length_stdev} \
         --identity ${mean_identity},${identity_stdev},${identity_stdev} \
         --seed ${seed} \
-        > "${temp_dir}/${genome_name}.fastq" 2>/dev/null
+        > "${temp_dir}/${genome_name}.fastq" #2>/dev/null
 done
 
 # Combine all reads
