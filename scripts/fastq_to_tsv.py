@@ -16,12 +16,16 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
         print("current tsv file in ",output_file)
 
         for record in SeqIO.parse(str(fastq_path),"fastq"):
+            """"
             parts = record.id.split("_")
             if len(parts) < 2:
                 raise ValueError(
                     f"Read ID '{record.id}' does not contain '_' -> cannot extract label with split('_')[1]"
                 )
             label = parts[1]
+            """
+            label = record.id.rsplit("_", 1)[0]
+
             file.write(f"{record.seq}\t{label}\n")
 
     print(f"Written TSV: {output_file}", file=sys.stderr)
