@@ -14,14 +14,13 @@
  */ 
 
 // Parameters -> will be written in config
-params.read_type = "LONG_reads"
 params.dataset_name = "mock_test"
 params.data_dir_name = "data_test"
 params.input_fastq = "${projectDir.parent}/data/simulated_reads/short_reads"
 params.output_base = "${projectDir.parent}/${params.data_dir_name}"
 params.config = "${projectDir.parent}/config.env"
 params.input_txt= "${projectDir.parent}/${params.data_dir_name}/input/input.txt"
-params.output_base_short = "${projectDir.parent}/${params.data_dir_name}/${params.read_type}"
+
 
 //python scripts
 
@@ -94,12 +93,13 @@ process process_fasta{
 * Apply Insilicoseq to fasta file
 */ 
 process short_reads {
-    publishDir "${params.output_base}/${params.read_type}/simulated_reads", mode: 'copy'
+    publishDir "${params.output_base}/short_reads/simulated_reads", mode: 'copy'
     input:
         path fasta_file
         path input_txt
     output:
-        path "${fasta_file.baseName}.fastq"
+        tuple val('short_reads'), path("${fasta_file.baseName}.fastq")
+        
     script:
         """
         tail -n +2 "${input_txt}" > abundance.txt
@@ -116,14 +116,15 @@ process short_reads {
         """
 }
 process long_reads {
-    publishDir "${params.output_base}/${params.read_type}/simulated_reads", mode: 'copy'
+    publishDir "${params.output_base}/long_reads/simulated_reads", mode: 'copy'
     
     input:
         path fasta_file
         path input_txt
     
     output:
-        path "${fasta_file.baseName}.fastq"
+        tuple val('long_reads'), path("${fasta_file.baseName}.fastq")
+        
     
     shell:
     '''
@@ -202,13 +203,13 @@ process long_reads {
 }
 //Convert FASTQ to TSV format
 process converting_reads_format {
-  publishDir "${params.output_base}/${params.read_type}/simulated_reads", mode: 'copy'
+  publishDir "${params.output_base}/${read_type}/simulated_reads", mode: 'copy'
 
   input:
-    path fastq_file
+    tuple val(read_type), path(fastq_file)
 
   output:
-    path "${fastq_file.simpleName}.tsv"
+    tuple val(read_type), path("${fastq_file.simpleName}.tsv")
 
   script:
   """
@@ -219,31 +220,31 @@ process converting_reads_format {
 }
 // only for testing 
 process get_n_lines_of_tsv {
-    publishDir "${params.output_base}/${params.read_type}/tsv_processed", mode: 'copy'
+    publishDir "${params.output_base}/${read_type}/tsv_processed", mode: 'copy'
     
     input:
-        path tsv_file
+        tuple val(read_type),path(tsv_file)
     
     output:
-        path "${tsv_file.baseName}_processed.tsv"
+        tuple val(read_type),path("${tsv_file.baseName}_processed.tsv")
     
     script:
     """
     head -n 10 ${tsv_file} > ${tsv_file.baseName}_processed.tsv
-    echo "Reduced from \$(wc -l < ${tsv_file}) to 65000 lines"
+    echo "Reduced from \$(wc -l < ${tsv_file}) to 10 lines"
     """
 }
 //Calculate embeddings
 process calculate_embeddings {
-  publishDir "${params.output_base}/${params.read_type}/embeddings", mode: 'copy'
+  publishDir "${params.output_base}/${read_type}/embeddings", mode: 'copy'
 
   input:
-    path tsv_file
+    tuple val(read_type), path(tsv_file)
 
   output:
-    path "${tsv_file.simpleName}_emb.npy"
-    path "${tsv_file.simpleName}_emb_stand.npy"
-    path "${tsv_file.simpleName}_labels.txt"
+    tuple val(read_type), path("${tsv_file.simpleName}_emb.npy")
+    tuple val(read_type), path("${tsv_file.simpleName}_emb_stand.npy")
+    tuple val(read_type), path("${tsv_file.simpleName}_labels.txt")
 
   script:
   """
@@ -279,15 +280,14 @@ process checkout_all_outputs {
 }
 //Calculate kmean clusters
 process kmeans_clustering {
-  publishDir "${params.output_base}/${params.read_type}/clustering", mode: 'copy'
+  publishDir "${params.output_base}/${read_type}/clustering", mode: 'copy'
 
   input:
-    path embedding_npy
-    path labels_txt
+    tuple val(read_type), path(embedding_npy), path(labels_txt)
 
   output:
-    path "${embedding_npy.simpleName}_kmeans_results.csv"
-    path "${embedding_npy.simpleName}_kmeans_results_metrics.txt"
+    tuple val(read_type), path("${embedding_npy.simpleName}_kmeans_results.csv")
+    tuple val(read_type), path("${embedding_npy.simpleName}_kmeans_results_metrics.txt")
 
   script:
   """
@@ -298,13 +298,11 @@ process kmeans_clustering {
     """
 }
 process visualization_embeddings{
-    publishDir "${params.output_base}/${params.read_type}/visualizations",mode:'copy' 
+    publishDir "${params.output_base}/${read_type}/visualizations",mode:'copy' 
     input:
-        path embeddings_stand_npy
-        path labels_txt
-        path kmeans_results
+        tuple val(read_type), path(embeddings_stand_npy), path(labels_txt), path(kmeans_results)
     output:
-        path "${embeddings_stand_npy.simpleName}.png"
+        tuple val(read_type), path("${embeddings_stand_npy.simpleName}.png")
     script:
     """
     
@@ -315,7 +313,37 @@ process visualization_embeddings{
             --output_file "${embeddings_stand_npy.simpleName}.png"
     """
 }
+workflow process_read_pipeline {
+    take: //declares the inputs of a named workflow
+        fastq_tuple // tuple (read_type, fastqfile)
+    main: 
+    //FASTQ to TSV
+    tsv_ch = converting_reads_format(fastq_tuple)
 
+    //TSV shorter (for testing)
+    tsv_processed = get_n_lines_of_tsv(tsv_ch)
+
+    //Calculate embeddings
+    emb_outputs = calculate_embeddings(tsv_processed)
+    // emb_outputs[0] = tuple(read_type, emb.npy)
+    // emb_outputs[1] = tuple(read_type, emb_stand.npy)
+    // emb_outputs[2] = tuple(read_type, labels.txt)
+
+    // keans clustering
+    kmenas_input = emb_outputs[0].join(emb_outputs[2])
+    //kmenas_input=    
+    // tuple value(read_type), path(embedding_npy)
+    // tuple value(read_type), path(labels_txt)
+    
+    kmeans_out=kmeans_clustering(kmenas_input)
+    // tuple value(read_type), path("${embedding_npy.simpleName}_kmeans_results.csv")
+    // tuple value(read_type), path("${embedding_npy.simpleName}_kmeans_results_metrics.txt")
+
+    // Visualization
+    //tuple val(read_type), path(embeddings_stand_npy), path(labels_txt), path(kmeans_results)
+    viz_input=emb_outputs[1].join(emb_outputs[2]).join(kmeans_out[0])
+    visualization_embeddings(viz_input)
+}
 workflow{
     println "current directory ${projectDir}"
     println "Input FASTQ: ${params.input_fastq}"
@@ -327,18 +355,13 @@ workflow{
     data_dir = "${projectDir.parent}/data"
 
     input_ch = Channel.fromPath(params.input_txt)
+
     fasta_files = download_fasta(input_ch)
     processed_fastas = process_fasta(fasta_files.collect(), input_ch)
-    combined_reads = long_reads(processed_fastas[1], input_ch)
-    //reads = Channel.fromFilePairs("${params.input_fastq}/*_R{1,2}.fastq")
-    
-  
-    tsv_ch = converting_reads_format(combined_reads)
-    tsv_processed = get_n_lines_of_tsv(tsv_ch)  // ← NEU!
-    emb_outputs = calculate_embeddings(tsv_processed)
-    checkout_all_outputs(emb_outputs[0], emb_outputs[1], emb_outputs[2])
-    kmeans_out=kmeans_clustering(emb_outputs[0],emb_outputs[2])
-    visualization_embeddings(emb_outputs[1],emb_outputs[2],kmeans_out[0])
-  
 
+    short_ch = short_reads(processed_fastas[1], input_ch)
+    long_ch  = long_reads(processed_fastas[1], input_ch)
+
+    reads_ch = short_ch.mix(long_ch)
+    process_read_pipeline(reads_ch)
 }
