@@ -221,4 +221,37 @@ modified scripts for pipeline:
 - download_genome.py
 - process_genomes.py
 
-### update: pull request changes von 31.01.2025
+### update: pull request changes von 31.01.2025 #1
+modified scripts:
+- pipeline.nf
+- fastq_to_tsv.py
+
+new files:
+parallized_pipeline.nf
+test_badread.sh
+
+pipeline.nf:
+included long read simulation process and adjusted processes if nessacry
+
+fastq_to_tsv.py:
+modified in order to correctly handle long read discriptors (diffrent formating that for short reads)
+
+parallized_pipeline.nf
+mostly the same as pipeline.nf but now parallized processes for short and long reads
+
+test_badread.sh
+had issues with badread tested diffrent parameters 
+
+### update: pull request changes von 31.01.2025 #2
+modified:
+- parallized_pipeline.nf
+
+new file:
+- nextflow.config
+
+-> created config file for netflow with the parameters and custome testing profile with parameter set for short runtime specifically
+
+with testing parameters
+usage: nextflow run parallized_pipeline.nf -profile test
+
+usage: nextflow run parallized_pipeline.nf

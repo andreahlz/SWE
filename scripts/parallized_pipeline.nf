@@ -13,39 +13,7 @@
  usage: nextflow run pipeline.nf
  */ 
 
-// Parameters -> will be written in config
-params.dataset_name = "mock_test"
-params.data_dir_name = "data_test"
-params.input_fastq = "${projectDir.parent}/data/simulated_reads/short_reads"
-params.output_base = "${projectDir.parent}/${params.data_dir_name}"
-params.config = "${projectDir.parent}/config.env"
-params.input_txt= "${projectDir.parent}/${params.data_dir_name}/input/input.txt"
 
-
-//python scripts
-
-params.py_fastq_to_tsv = "${projectDir}/fastq_to_tsv.py"
-params.py_embedding_calc = "${projectDir}/calculate_embedding_for_tsv_02.py"
-params.py_kmeans = "${projectDir}/cluster_embeddings.py"
-params.py_visualization = "${projectDir}/visualize_embeddings.py"
-params.py_download = "${projectDir}/download_genome.py"
-params.py_process_fna = "${projectDir}/process_genomes.py"
-
-//simulation parameters
-params.mean_length=1000
-/*
-params.mean_identity=95
-params.identity_stdev=5
-
-*/ 
-params.length_stdev=500
-params.indentity="nanopore2023"
-params.seed=42
-
-// DNABERT-S local directory (used with model_list "test")
-params.test_model_dir = "${projectDir.parent}/DNABERT-S"
-
-params.data_dir = "."
 
 process download_fasta{
     tag "ncbi-genomes"
@@ -108,8 +76,8 @@ process short_reads {
         iss generate \
             --genomes ${fasta_file} \
             --abundance_file abundance.txt \
-            --model MiSeq \
-            --n_reads 20 \
+            --model ${params.model_short} \
+            --n_reads ${params.n_reads_short} \
             --output temp_reads
         
         cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
@@ -183,7 +151,12 @@ process long_reads {
         
         echo "  ${genome_name}: abundance=${abundance}, coverage=${coverage}x"
         
-        badread simulate --reference "${genome_file}" --quantity "${coverage}x" --length !{params.mean_length},!{params.length_stdev} --seed !{params.seed} > "${temp_dir}/${genome_name}.fastq"
+        badread simulate \
+            --reference "${genome_file}" \
+            --quantity "${coverage}x" \
+            --length !{params.mean_length_long},!{params.length_stdev_long} \
+            --seed !{params.seed_long} \
+            > "${temp_dir}/${genome_name}.fastq"
     done
     
     echo ""
@@ -230,8 +203,8 @@ process get_n_lines_of_tsv {
     
     script:
     """
-    head -n 10 ${tsv_file} > ${tsv_file.baseName}_processed.tsv
-    echo "Reduced from \$(wc -l < ${tsv_file}) to 10 lines"
+    head -n ${params.n_lines_test} ${tsv_file} > ${tsv_file.baseName}_processed.tsv
+    echo "Reduced from \$(wc -l < ${tsv_file}) to ${params.n_lines_test} lines"
     """
 }
 //Calculate embeddings
