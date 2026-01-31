@@ -16,6 +16,9 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
         print("current tsv file in ",output_file)
 
         for record in SeqIO.parse(str(fastq_path),"fastq"):
+            # Extract label based on format
+            # Short reads: @GCF_000025985.1_0_0/1
+            # Long reads: @uuid GCF_000025985.1,+strand,start-end ..
             """"
             parts = record.id.split("_")
             if len(parts) < 2:
@@ -24,7 +27,16 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
                 )
             label = parts[1]
             """
-            label = record.id.rsplit("_", 1)[0]
+            description = record.description #saves header
+            if ' ' in description: #badread reads have whitespaces
+                parts = description.split()
+                if len(parts) >= 2:
+                    genome_descriptor = parts[1]
+                    label= genome_descriptor.split(',')[0]
+                else:
+                    raise ValueError(f"Unexpected Badread format: {description}")
+            else:
+                label = record.id.rsplit("_", 1)[0]
 
             file.write(f"{record.seq}\t{label}\n")
 
