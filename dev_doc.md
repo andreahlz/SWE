@@ -9,7 +9,7 @@ input:
 output:
 - npz file containing all distance arrays 
 - This script calculates the averaged within and between cluster distances for each cluster and pair of clusters. Eucledian distances are used, the formulas are as following:
-- Averaged within cluster distance:
+Averaged within cluster distance:
 - d̄_k = (1 / |C_k|) * Σ d(x_i, μ_k)
 - Between cluster distance of clusters \( C_k \) and \( C_l \) with centroids \( \mu_k \) and \( \mu_l \):
 - d(k, l) = d(μ_k, μ_l)
@@ -21,6 +21,7 @@ where:
 - `x_i` is a point belonging to cluster `k`
 - `μ_k` is the centroid of cluster `k`
 - `d(·, ·)` is the chosen distance metric
+  
 compare_distances.py
 input: npz file 1, 
 - file_1: npz file containing distances of short reads (produced by distances_within_between_cluster.py)
@@ -286,4 +287,5 @@ with testing parameters
 usage: nextflow run parallized_pipeline.nf -profile test
 
 usage: nextflow run parallized_pipeline.nf
+
 
