@@ -1,5 +1,36 @@
 # SWE Project Logbook
 
+##UPDATE: barbara_only_relevant - py scritpts for calculation and visualization of distances added
+distances_within_between_cluster.py
+input:
+- embedding_file: npy file containing the embedding
+- label_file: csv file containing true (column 1) and predicted (column 2) labels
+- outfile: Path the the output npz file. The output npz file contains the arrays for following data: Between cluster distances, averaged within cluster distances, distances from data point to respective centroid for all data points, true labels of all data points.
+output:
+- npz file containing all distance arrays 
+- This script calculates the averaged within and between cluster distances for each cluster and pair of clusters. Eucledian distances are used, the formulas are as following:
+- Averaged within cluster distance:
+- d̄_k = (1 / |C_k|) * Σ d(x_i, μ_k)
+- Between cluster distance of clusters \( C_k \) and \( C_l \) with centroids \( \mu_k \) and \( \mu_l \):
+- d(k, l) = d(μ_k, μ_l)
+where:
+- `μ_k`, `μ_l` are the centroids of clusters `k` and `l`
+- `d(·, ·)` is the chosen distance metric (e.g. Euclidean distance)
+where:
+- `|C_k|` is the number of points in cluster `k`
+- `x_i` is a point belonging to cluster `k`
+- `μ_k` is the centroid of cluster `k`
+- `d(·, ·)` is the chosen distance metric
+compare_distances.py
+input: npz file 1, 
+- file_1: npz file containing distances of short reads (produced by distances_within_between_cluster.py)
+- file_2: npz file containing distances of long reads (produced by distances_within_between_cluster.py)
+- result_png: path and name of the distance visualization produced by this script
+output:
+- png of distance visualization
+For each cluster and for each read mode (short,long) violin plots are produced. These plots visualize the distances from the embedded sequences to their centroids. Furthermore two heatmaps
+capturing the between cluster distances are plotted. The between cluster distances are normalized by the maximum of between cluster distances for both short and long reads.
+
 ## NEXT TO DO:
 - testing pipline
 - long_reads and short_reads nor fair comparison possible (at the moment): 
@@ -255,3 +286,4 @@ with testing parameters
 usage: nextflow run parallized_pipeline.nf -profile test
 
 usage: nextflow run parallized_pipeline.nf
+
