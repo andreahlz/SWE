@@ -1,7 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {"name":"Python Debugger: Current File","type":"debugpy","request":"launch","program":"${file}","console":"integratedTerminal"},
+    {"name":"Python Debugger: Current File","type":"debugpy","request":"launch","program":"${file}","console":"internalConsole"},
     {
       "name": "Python: Debug dnabert_s.py (prompt inputs)",
       "type": "python",
