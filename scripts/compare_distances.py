@@ -15,7 +15,7 @@ def nr_rows_cols(nr_plots):
     return n_rows,rows_violin,n_cols
 
 def try_gs_vis(file1,file2,dataframe_list,rows,rows_violin,cols,save_distance_visualization):
-    gs_vio = gridspec.GridSpec(rows_violin,cols,left=0.05,right=0.95,top=0.95,bottom=0.4,wspace=0.4)
+    gs_vio = gridspec.GridSpec(rows_violin,cols,left=0.05,right=0.95,top=0.95,bottom=0.4,wspace=0.4,hspace=0.2)
     labels=list(set(file2['true_label']))
     cur_row=0
     fig = plt.figure(figsize=(cols*4, rows*3))  
@@ -60,8 +60,10 @@ def try_gs_vis(file1,file2,dataframe_list,rows,rows_violin,cols,save_distance_vi
         im = ax.imshow(ds, cmap=cmap_rev,vmin=0,vmax=1)
         mode = ['Short', 'Long'][ind]
         ax.set_title(f'{mode} reads', fontsize=13, pad=10)
-        ax.set_xticks(range(len(labels)), labels, rotation=45)
-        ax.set_yticks(range(len(labels)), labels)
+        ax.set_xticks(range(len(labels)), labels=labels, rotation=45,rotation_mode="anchor",ha="right")
+        ax.set_yticks(range(len(labels)), labels=labels)
+        ax.set_xlabel('Species')
+        ax.set_ylabel('Species')
         cbar = plt.colorbar(im, ax=ax, label='Normalized Distance',shrink=0.8)
         cbar.set_label('Normalized distance',labelpad=8)
     plt.savefig(save_distance_visualization)
