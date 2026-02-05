@@ -18,11 +18,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Nextflow workflow report for run id [hopeful_lavoisier]">
+  <meta name="description" content="Nextflow workflow report for run id [stoic_liskov]">
   <meta name="author" content="Paolo Di Tommaso, Phil Ewels">
   <link rel="icon" type="image/png" href="https://www.nextflow.io/img/favicon.png" />
 
-  <title>[hopeful_lavoisier] Nextflow Workflow Report</title>
+  <title>[stoic_liskov] Nextflow Workflow Report</title>
 
   <style type="text/css">
   /*!
@@ -137,7 +137,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         <li class="nav-item"><a class="nav-link" href="#tasks">Tasks</a></li>
       </ul>
       <span class="navbar-text">
-        [hopeful_lavoisier]
+        [stoic_liskov]
       </span>
     </div>
   </nav>
@@ -146,22 +146,22 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
     <div class="container">
 
       <h1 class="display-3">Nextflow workflow report</h1>
-      <h2 class="text-muted mb-4"><samp>[hopeful_lavoisier]</samp> </h2>
+      <h2 class="text-muted mb-4"><samp>[stoic_liskov]</samp> </h2>
 
       
           <div class="alert alert-danger mb-4">
               <h4>Workflow execution completed unsuccessfully!</h4>
               <p>The exit status of the task that caused the workflow execution to fail was: <code>1</code>.</p>
               <p>The full error message was:</p>
-              <pre>Error executing process > 'download_fasta (ncbi-genomes)'
+              <pre>Error executing process > 'process_read_pipeline:converting_reads_format (1)'
 
 Caused by:
-  Process `download_fasta (ncbi-genomes)` terminated with an error exit status (1)
+  Process `process_read_pipeline:converting_reads_format (1)` terminated with an error exit status (1)
 
 
 Command executed:
 
-  python3 /mnt/c/Users/andyf/SWE/scripts/download_genome.py         --input_file "input.txt"         --output_dir .         --timeout 300
+  python3 "/mnt/c/Users/andyf/SWE/scripts/fastq_to_tsv.py"     --input "test_run.fastq"     --output "test_run.tsv"
 
 Command exit status:
   1
@@ -171,32 +171,42 @@ Command output:
 
 Command error:
   Traceback (most recent call last):
-    File "/mnt/c/Users/andyf/SWE/scripts/download_genome.py", line 124, in <module>
-      main(args)
-    File "/mnt/c/Users/andyf/SWE/scripts/download_genome.py", line 95, in main
-      with open(input_file) as f:
-  FileNotFoundError: [Errno 2] No such file or directory: 'input.txt'
+    File "/mnt/c/Users/andyf/SWE/scripts/fastq_to_tsv.py", line 8, in <module>
+      iss_re = re.compile(r'^(.+?)_\d+_\d+_(?./\d+)?$')
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/re.py", line 252, in compile
+      return _compile(pattern, flags)
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/re.py", line 304, in _compile
+      p = sre_compile.compile(pattern, flags)
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/sre_compile.py", line 788, in compile
+      p = sre_parse.parse(p, flags)
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/sre_parse.py", line 955, in parse
+      p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/sre_parse.py", line 444, in _parse_sub
+      itemsappend(_parse(source, state, verbose, nested + 1,
+    File "/home/andyfely/miniconda3/envs/readsdnaberts/lib/python3.9/sre_parse.py", line 830, in _parse
+      raise source.error("unknown extension ?" + char,
+  re.error: unknown extension ?. at position 16
 
 Work dir:
-  /mnt/c/Users/andyf/SWE/scripts/work/f7/f4d0d7ec551305bda69126c5de5e29
+  /mnt/c/Users/andyf/SWE/scripts/work/b9/a9c7451b67d12a159b93a14b40b0b4
 
-Tip: when you have fixed the problem you can continue the execution adding the option `-resume` to the run command line</pre>
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`</pre>
           </div>
       
 
       <dl>
         <dt>Run times</dt>
         <dd>
-          <span id="workflow_start">05-Feb-2026 20:30:50</span> - <span id="workflow_complete">05-Feb-2026 20:30:52</span>
-          (<span id="completed_fromnow"></span>duration: <strong>1.7s</strong>)
+          <span id="workflow_start">05-Feb-2026 22:25:49</span> - <span id="workflow_complete">05-Feb-2026 22:26:22</span>
+          (<span id="completed_fromnow"></span>duration: <strong>32.3s</strong>)
         </dd>
 
         <dl>
           <div class="progress" style="height: 1.6rem; margin: 1.2rem auto; border-radius: 0.20rem;">
-            <div style="width: 0.0%" class="progress-bar bg-success" data-toggle="tooltip" data-placement="top" title="0 tasks succeeded"><span class="text-truncate">&nbsp; 0 succeeded &nbsp;</span></div>
+            <div style="width: 75.0%" class="progress-bar bg-success" data-toggle="tooltip" data-placement="top" title="3 tasks succeeded"><span class="text-truncate">&nbsp; 3 succeeded &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-secondary" data-toggle="tooltip" data-placement="top" title="0 tasks were cached"><span class="text-truncate">&nbsp; 0 cached &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-warning" data-toggle="tooltip" data-placement="top" title="0 tasks failed and were ignored"><span class="text-truncate">&nbsp; 0 ignored &nbsp;</span></div>
-            <div style="width: 100.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="1 tasks failed"><span class="text-truncate">&nbsp; 1 failed (0 retries) &nbsp;</span></div>
+            <div style="width: 25.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="1 tasks failed"><span class="text-truncate">&nbsp; 1 failed (0 retries) &nbsp;</span></div>
           </div>
         </dl>
 
@@ -228,7 +238,7 @@ Tip: when you have fixed the problem you can continue the execution adding the o
         
 
         <dt class="col-sm-3">Workflow session</dt>
-        <dd class="col-sm-9"><code>98e168ae-af28-4293-8c7c-50ee964d2fc9</code></dd>
+        <dd class="col-sm-9"><code>0dd03021-c310-4752-a808-e56d1a023c81</code></dd>
 
         
 
@@ -1062,7 +1072,7 @@ $(function() {
 
   // Nextflow report data
   window.data = { "trace":[
-{"task_id":"1","hash":"f7\/f4d0d7","native_id":"49583","process":"download_fasta","module":"-","container":"-","tag":"ncbi-genomes","name":"download_fasta (ncbi-genomes)","status":"FAILED","exit":"1","submit":"1770319852219","start":"1770319852313","complete":"1770319852476","duration":"257","realtime":"163","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/f7\/f4d0d7ec551305bda69126c5de5e29","script":"\n        python3 \/mnt\/c\/Users\/andyf\/SWE\/scripts\/download_genome.py         --input_file \"input.txt\"         --output_dir .         --timeout 300\n","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"}], "summary":[{"cpuUsage":null,"process":"download_fasta","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":{"mean":163,"min":163,"q1":163,"q2":163,"q3":163,"max":163,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"writes":null}] };
+{"task_id":"1","hash":"2e\/e41462","native_id":"55161","process":"download_fasta","module":"-","container":"-","tag":"ncbi-genomes","name":"download_fasta (ncbi-genomes)","status":"COMPLETED","exit":"0","submit":"1770326752981","start":"1770326753064","complete":"1770326764134","duration":"11153","realtime":"10948","%cpu":"9.0","%mem":"0.5","rss":"44081152","vmem":"53657600","peak_rss":"46804992","peak_vmem":"56848384","rchar":"13671022","wchar":"27613417","syscr":"5353","syscw":"45","read_bytes":"12664832","write_bytes":"0","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/2e\/e414625f7d1657809b07037f0d30e9","script":"\n        python3 \/mnt\/c\/Users\/andyf\/SWE\/scripts\/download_genome.py         --input_file \"input.txt\"         --output_dir .         --timeout 300\n","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"1321","inv_ctxt":"6","hostname":"-","cpu_model":"AMD Ryzen 5 5625U with Radeon Graphics"},{"task_id":"2","hash":"ba\/b0b9a1","native_id":"55738","process":"process_fasta","module":"-","container":"-","tag":"-","name":"process_fasta (1)","status":"COMPLETED","exit":"0","submit":"1770326764514","start":"1770326764535","complete":"1770326769569","duration":"5055","realtime":"4750","%cpu":"19.3","%mem":"0.2","rss":"22200320","vmem":"26443776","peak_rss":"30011392","peak_vmem":"34189312","rchar":"56187690","wchar":"55195022","syscr":"3728","syscw":"3399","read_bytes":"135168","write_bytes":"0","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/ba\/b0b9a1197bad30a304700f3933ed6b","script":"\n    mkdir -p raw processed\n    mv *.fna raw\/\n\n    python3 \/mnt\/c\/Users\/andyf\/SWE\/scripts\/process_genomes.py         --input_file \"input.txt\"         --single_fastas_dir raw         --output_dir processed          --csv_output \"header_info.csv\"         --multifasta_output \"test_run.fna\"\n","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"7850","inv_ctxt":"2","hostname":"-","cpu_model":"AMD Ryzen 5 5625U with Radeon Graphics"},{"task_id":"4","hash":"2a\/51552a","native_id":"56047","process":"short_reads","module":"-","container":"-","tag":"-","name":"short_reads (1)","status":"COMPLETED","exit":"0","submit":"1770326770017","start":"1770326770075","complete":"1770326780448","duration":"10431","realtime":"9897","%cpu":"44.0","%mem":"3.5","rss":"276209664","vmem":"1195593728","peak_rss":"278061056","peak_vmem":"1197428736","rchar":"115354400","wchar":"44537395","syscr":"10083","syscw":"476","read_bytes":"75243520","write_bytes":"4096","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/2a\/51552a585980d3bef9b34170dac6ef","script":"\n        tail -n +2 \"input.txt\" > abundance.txt\n        echo \'starting read generation for test_run\'\n        echo \'fasta_file name = test_run.fna\'\n        iss generate             --genomes test_run.fna             --abundance_file abundance.txt             --model MiSeq             --n_reads 10             --output temp_reads\n        \n        cat temp_reads_R1.fastq temp_reads_R2.fastq > test_run.fastq\n        ","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"9992","inv_ctxt":"7","hostname":"-","cpu_model":"AMD Ryzen 5 5625U with Radeon Graphics"},{"task_id":"3","hash":"f9\/f0075b","native_id":"56060","process":"long_reads","module":"-","container":"-","tag":"-","name":"long_reads (1)","status":"ABORTED","exit":"-","submit":"1770326770268","start":"1770326770376","complete":"-","duration":"-","realtime":"-","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/f9\/f0075b880f7c740e2ef329850925f9","script":"\n    #!\/bin\/bash\n    set -euo pipefail\n    \n    output_dir=\".\"\n    file_name=\"test_run\"\n    temp_dir=\"${output_dir}\/temp\"\n    mkdir -p \"${temp_dir}\"\n\n    # Read abundances\n    declare -A abundances\n    while IFS=$\'\\t\' read -r species abundance; do\n        [[ \"$species\" == \"species\" ]] && continue\n        abundances[\"$species\"]=$abundance\n    done < \"input.txt\"\n\n    # Split multifasta\n    echo \"Splitting multifasta into individual genomes...\"\n    awk -v outdir=\"${temp_dir}\" \'\n    \/^>\/ {\n        if (seq != \"\" && filename != \"\") {\n            print seq > filename\n            close(filename)\n        }\n        seq = \"\"\n        split($0, a, \" \")\n        gsub(\/^>\/, \"\", a[1])\n        filename = outdir \"\/\" a[1] \".fna\"\n        print $0 > filename\n        next\n    }\n    {\n        seq = seq $0\n    }\n    END {\n        if (seq != \"\" && filename != \"\") {\n            print seq > filename\n            close(filename)\n        }\n    }\' \"test_run.fna\"\n\n    echo \"Created genome files:\"\n    ls -lh \"${temp_dir}\/\"*.fna\n\n    # Simulate reads\n    echo \"\"\n    echo \"Simulating long reads with Badread...\"\n    for genome_file in \"${temp_dir}\"\/*.fna; do\n        [[ ! -f \"$genome_file\" ]] && continue\n        \n        genome_name=$(basename \"$genome_file\" .fna)\n        abundance=${abundances[$genome_name]:-0.01}\n        coverage=$(echo \"$abundance * 10\" | bc -l | awk \'{printf \"%.2f\", $0}\')\n        \n        echo \"  ${genome_name}: abundance=${abundance}, coverage=${coverage}x\"\n        \n        badread simulate             --reference \"${genome_file}\"             --quantity \"${coverage}x\"             --length 500,500             --seed 42             > \"${temp_dir}\/${genome_name}.fastq\"\n    done\n    \n    echo \"\"\n    echo \"Created FASTQ files:\"\n    ls -lh \"${temp_dir}\"\/*.fastq\n    \n    echo \"\"\n    echo \"Combining reads...\"\n    cat \"${temp_dir}\"\/*.fastq > \"${output_dir}\/${file_name}.fastq\"\n\n    echo \"Cleaning up...\"\n    rm -rf \"${temp_dir}\"\n    \n    echo \"\"\n    echo \" Done! Output: ${file_name}.fastq\"\n    ","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"},{"task_id":"5","hash":"b9\/a9c745","native_id":"57133","process":"process_read_pipeline:converting_reads_format","module":"-","container":"-","tag":"-","name":"process_read_pipeline:converting_reads_format (1)","status":"FAILED","exit":"1","submit":"1770326780747","start":"1770326780853","complete":"1770326781853","duration":"1106","realtime":"1000","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/work\/b9\/a9c7451b67d12a159b93a14b40b0b4","script":"\n  python3 \"\/mnt\/c\/Users\/andyf\/SWE\/scripts\/fastq_to_tsv.py\"     --input \"test_run.fastq\"     --output \"test_run.tsv\"\n  ","scratch":"-","queue":"-","cpus":"1","memory":"-","disk":"-","time":"-","env":"-","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"}], "summary":[{"cpuUsage":{"mean":9,"min":9,"q1":9,"q2":9,"q3":9,"max":9,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"process":"download_fasta","mem":{"mean":46804992,"min":46804992,"q1":46804992,"q2":46804992,"q3":46804992,"max":46804992,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"memUsage":null,"timeUsage":null,"vmem":{"mean":56848384,"min":56848384,"q1":56848384,"q2":56848384,"q3":56848384,"max":56848384,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"reads":{"mean":13671022,"min":13671022,"q1":13671022,"q2":13671022,"q3":13671022,"max":13671022,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"cpu":{"mean":9,"min":9,"q1":9,"q2":9,"q3":9,"max":9,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"time":{"mean":10948,"min":10948,"q1":10948,"q2":10948,"q3":10948,"max":10948,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"},"writes":{"mean":27613417,"min":27613417,"q1":27613417,"q2":27613417,"q3":27613417,"max":27613417,"minLabel":"download_fasta (ncbi-genomes)","maxLabel":"download_fasta (ncbi-genomes)","q1Label":"download_fasta (ncbi-genomes)","q2Label":"download_fasta (ncbi-genomes)","q3Label":"download_fasta (ncbi-genomes)"}},{"cpuUsage":{"mean":19.3,"min":19.3,"q1":19.3,"q2":19.3,"q3":19.3,"max":19.3,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"process":"process_fasta","mem":{"mean":30011392,"min":30011392,"q1":30011392,"q2":30011392,"q3":30011392,"max":30011392,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"memUsage":null,"timeUsage":null,"vmem":{"mean":34189312,"min":34189312,"q1":34189312,"q2":34189312,"q3":34189312,"max":34189312,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"reads":{"mean":56187690,"min":56187690,"q1":56187690,"q2":56187690,"q3":56187690,"max":56187690,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"cpu":{"mean":19.3,"min":19.3,"q1":19.3,"q2":19.3,"q3":19.3,"max":19.3,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"time":{"mean":4750,"min":4750,"q1":4750,"q2":4750,"q3":4750,"max":4750,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"},"writes":{"mean":55195022,"min":55195022,"q1":55195022,"q2":55195022,"q3":55195022,"max":55195022,"minLabel":"process_fasta (1)","maxLabel":"process_fasta (1)","q1Label":"process_fasta (1)","q2Label":"process_fasta (1)","q3Label":"process_fasta (1)"}},{"cpuUsage":{"mean":44,"min":44,"q1":44,"q2":44,"q3":44,"max":44,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"process":"short_reads","mem":{"mean":278061056,"min":278061056,"q1":278061056,"q2":278061056,"q3":278061056,"max":278061056,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"memUsage":null,"timeUsage":null,"vmem":{"mean":1197428736,"min":1197428736,"q1":1197428736,"q2":1197428736,"q3":1197428736,"max":1197428736,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"reads":{"mean":115354400,"min":115354400,"q1":115354400,"q2":115354400,"q3":115354400,"max":115354400,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"cpu":{"mean":44,"min":44,"q1":44,"q2":44,"q3":44,"max":44,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"time":{"mean":9897,"min":9897,"q1":9897,"q2":9897,"q3":9897,"max":9897,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"},"writes":{"mean":44537395,"min":44537395,"q1":44537395,"q2":44537395,"q3":44537395,"max":44537395,"minLabel":"short_reads (1)","maxLabel":"short_reads (1)","q1Label":"short_reads (1)","q2Label":"short_reads (1)","q3Label":"short_reads (1)"}},{"cpuUsage":null,"process":"converting_reads_format","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":{"mean":1000,"min":1000,"q1":1000,"q2":1000,"q3":1000,"max":1000,"minLabel":"process_read_pipeline:converting_reads_format (1)","maxLabel":"process_read_pipeline:converting_reads_format (1)","q1Label":"process_read_pipeline:converting_reads_format (1)","q2Label":"process_read_pipeline:converting_reads_format (1)","q3Label":"process_read_pipeline:converting_reads_format (1)"},"writes":null},{"cpuUsage":null,"process":"long_reads","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":null,"writes":null}] };
 
   </script>
 
