@@ -206,15 +206,24 @@ $(function() {
 
   // Nextflow report data
   window.data = {
-    "elapsed": "33.7s",
-    "beginningMillis": 1770326750219,
-    "endingMillis": 1770326783870,
+    "elapsed": "1m 39s",
+    "beginningMillis": 1770328963451,
+    "endingMillis": 1770329062547,
     "processes": [
-        {"label": "download_fasta (ncbi-genomes)", "cached": false, "index": 0, "times": [{"starting_time": 1770326752981, "ending_time": 1770326753064}, {"starting_time": 1770326753064, "ending_time": 1770326764012, "label": "11.2s \/ 44.6 MB"}, {"starting_time": 1770326764012, "ending_time": 1770326764134}]},
-        {"label": "process_fasta (1)", "cached": false, "index": 1, "times": [{"starting_time": 1770326764514, "ending_time": 1770326764535}, {"starting_time": 1770326764535, "ending_time": 1770326769285, "label": "5.1s \/ 28.6 MB"}, {"starting_time": 1770326769285, "ending_time": 1770326769569}]},
-        {"label": "short_reads (1)", "cached": false, "index": 2, "times": [{"starting_time": 1770326770017, "ending_time": 1770326770075}, {"starting_time": 1770326770075, "ending_time": 1770326779972, "label": "10.4s \/ 265.2 MB"}, {"starting_time": 1770326779972, "ending_time": 1770326780448}]},
-        {"label": "long_reads (1)", "cached": false, "index": 3, "times": [{"starting_time": 1770326770268, "ending_time": 1770326770376}]},
-        {"label": "process_read_pipeline:converting_reads_format (1)", "cached": false, "index": 4, "times": [{"starting_time": 1770326780747, "ending_time": 1770326780853}, {"starting_time": 1770326780853, "ending_time": 1770326781853, "label": "1.1s \/ -"}]}
+        {"label": "download_fasta (ncbi-genomes)", "cached": false, "index": 0, "times": [{"starting_time": 1770328964886, "ending_time": 1770328964918}, {"starting_time": 1770328964918, "ending_time": 1770328975909, "label": "11.1s \/ 43.8 MB"}, {"starting_time": 1770328975909, "ending_time": 1770328975972}]},
+        {"label": "process_fasta (1)", "cached": false, "index": 1, "times": [{"starting_time": 1770328976137, "ending_time": 1770328976172}, {"starting_time": 1770328976172, "ending_time": 1770328977476, "label": "1.4s \/ 28.4 MB"}, {"starting_time": 1770328977476, "ending_time": 1770328977569}]},
+        {"label": "short_reads (1)", "cached": false, "index": 2, "times": [{"starting_time": 1770328977686, "ending_time": 1770328977769}, {"starting_time": 1770328977769, "ending_time": 1770328981145, "label": "3.5s \/ 241.4 MB"}, {"starting_time": 1770328981145, "ending_time": 1770328981197}]},
+        {"label": "long_reads (1)", "cached": false, "index": 3, "times": [{"starting_time": 1770328977756, "ending_time": 1770328977770}, {"starting_time": 1770328977770, "ending_time": 1770329048787, "label": "1m 11s \/ 227.7 MB"}, {"starting_time": 1770329048787, "ending_time": 1770329048884}]},
+        {"label": "process_read_pipeline:converting_reads_format (1)", "cached": false, "index": 4, "times": [{"starting_time": 1770328981242, "ending_time": 1770328981297}, {"starting_time": 1770328981297, "ending_time": 1770328981553, "label": "333ms \/ 9.7 MB"}, {"starting_time": 1770328981553, "ending_time": 1770328981575}]},
+        {"label": "process_read_pipeline:get_n_lines_of_tsv (1)", "cached": false, "index": 5, "times": [{"starting_time": 1770328981623, "ending_time": 1770328981676}, {"starting_time": 1770328981676, "ending_time": 1770328981699, "label": "116ms \/ 3.1 MB"}, {"starting_time": 1770328981699, "ending_time": 1770328981739}]},
+        {"label": "process_read_pipeline:calculate_embeddings (1)", "cached": false, "index": 6, "times": [{"starting_time": 1770328981787, "ending_time": 1770328981839}, {"starting_time": 1770328981839, "ending_time": 1770328995808, "label": "14s \/ 3.4 GB"}, {"starting_time": 1770328995808, "ending_time": 1770328995832}]},
+        {"label": "process_read_pipeline:kmeans_clustering (1)", "cached": false, "index": 7, "times": [{"starting_time": 1770328996052, "ending_time": 1770328996132}, {"starting_time": 1770328996132, "ending_time": 1770328997521, "label": "1.5s \/ 189.4 MB"}, {"starting_time": 1770328997521, "ending_time": 1770328997527}]},
+        {"label": "process_read_pipeline:visualization_embeddings (1)", "cached": false, "index": 8, "times": [{"starting_time": 1770328997588, "ending_time": 1770328997628}, {"starting_time": 1770328997628, "ending_time": 1770329001527, "label": "4s \/ 310.9 MB"}, {"starting_time": 1770329001527, "ending_time": 1770329001568}]},
+        {"label": "process_read_pipeline:converting_reads_format (2)", "cached": false, "index": 4, "times": [{"starting_time": 1770329048936, "ending_time": 1770329048983}, {"starting_time": 1770329048983, "ending_time": 1770329049462, "label": "559ms \/ 10.2 MB"}, {"starting_time": 1770329049462, "ending_time": 1770329049495}]},
+        {"label": "process_read_pipeline:get_n_lines_of_tsv (2)", "cached": false, "index": 5, "times": [{"starting_time": 1770329049529, "ending_time": 1770329049595}, {"starting_time": 1770329049595, "ending_time": 1770329049649, "label": "133ms \/ 3.2 MB"}, {"starting_time": 1770329049649, "ending_time": 1770329049662}]},
+        {"label": "process_read_pipeline:calculate_embeddings (2)", "cached": false, "index": 6, "times": [{"starting_time": 1770329049699, "ending_time": 1770329049762}, {"starting_time": 1770329049762, "ending_time": 1770329057939, "label": "8.2s \/ 3.4 GB"}]},
+        {"label": "process_read_pipeline:kmeans_clustering (2)", "cached": false, "index": 7, "times": [{"starting_time": 1770329057982, "ending_time": 1770329058038}, {"starting_time": 1770329058038, "ending_time": 1770329059151, "label": "1.2s \/ 195.3 MB"}, {"starting_time": 1770329059151, "ending_time": 1770329059163}]},
+        {"label": "process_read_pipeline:visualization_embeddings (2)", "cached": false, "index": 8, "times": [{"starting_time": 1770329059209, "ending_time": 1770329059263}, {"starting_time": 1770329059263, "ending_time": 1770329061563, "label": "2.4s \/ 312.6 MB"}, {"starting_time": 1770329061563, "ending_time": 1770329061584}]}
     ]
 }
 ;
