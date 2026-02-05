@@ -171,7 +171,7 @@ process long_reads {
     rm -rf "${temp_dir}"
     
     echo ""
-    echo "✓ Done! Output: ${file_name}.fastq"
+    echo " Done! Output: ${file_name}.fastq"
     '''
 }
 //Convert FASTQ to TSV format
@@ -286,6 +286,21 @@ process visualization_embeddings{
             --output_file "${embeddings_stand_npy.simpleName}.png"
     """
 }
+process visualization_cluster_distances{
+    publishDir "${params.output_base}/${read_type}/visualizations",mode:'copy' 
+    input:
+        tuple val(read_type), path(embeddings_npy), path(labels_txt)
+    output:
+        tuple val(read_type), path("${embeddings_npy.simpleName}_cluster_distances.png")
+    script:
+    """
+    
+    python3 ${params.py_visualization_cluster_dist} \
+            --embedding_file ${embeddings_npy} \
+            --label_file ${labels_txt} \
+            --outfile "${embeddings_npy.simpleName}_cluster_distances.png"
+    """
+}
 workflow process_read_pipeline {
     take: //declares the inputs of a named workflow
         fastq_tuple // tuple (read_type, fastqfile)
@@ -316,6 +331,8 @@ workflow process_read_pipeline {
     //tuple val(read_type), path(embeddings_stand_npy), path(labels_txt), path(kmeans_results)
     viz_input=emb_outputs[1].join(emb_outputs[2]).join(kmeans_out[0])
     visualization_embeddings(viz_input)
+    //viz_cluster_input = emb_outputs[0].join(emb_outputs[2])
+    //visualization_cluster_distances(viz_cluster_input)
 }
 workflow{
     println "current directory ${projectDir}"

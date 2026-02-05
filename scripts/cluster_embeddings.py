@@ -17,7 +17,9 @@ from sklearn.cluster import KMeans
 def load_embeddings_from_npy(npy_file,label_file):
     embeddings = np.load(npy_file)
     with open(label_file, 'r') as f:
-        labels = f.read().strip().split('\n')
+
+        lines = f.read().strip().split('\n')
+        labels = lines[1:] #header skip
     return embeddings, labels
 
 
