@@ -8,7 +8,7 @@ pipeline_script="${project_root}/scripts/parallized_pipeline.nf"
 Job_name=SWE_nextflow_pipeline
 cpus=4
 memory=8GB
-time=1-00:00:00
+time=2-00:00:00
 
 mkdir -p "${project_root}/slurm_scripts" "${project_root}/logs"
 mkdir -p "${project_root}/.nextflow" "${project_root}/nextflow_work"
@@ -27,10 +27,7 @@ cat > "${job_file}" <<EOF
 #SBATCH --error=${project_root}/logs/%x-%j.err
 #SBATCH --time=${time}
 
-module load anaconda3
-
 #conda enviroment
-source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate readsdnaberts
 
 

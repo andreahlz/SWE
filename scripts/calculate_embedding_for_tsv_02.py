@@ -65,6 +65,7 @@ def main():
     np.save(os.path.join(output_dir, f"{base_name}_emb_stand.npy"), embedding_standard)
     labels_path = os.path.join(output_dir, f"{base_name}_labels.txt")
     with open(labels_path, 'w') as f:
+        f.write("true_label\n")
         for label in labels:
             f.write(f"{label}\n")
 
