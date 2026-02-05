@@ -1,2 +1,0 @@
-task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	f7/f4d0d7	49583	download_fasta (ncbi-genomes)	FAILED	1	2026-02-05 20:30:52.219	257ms	163ms	-	-	-	-	-
