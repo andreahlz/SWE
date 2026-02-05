@@ -255,3 +255,59 @@ with testing parameters
 usage: nextflow run parallized_pipeline.nf -profile test
 
 usage: nextflow run parallized_pipeline.nf
+
+### update new branch: lisc pipeline
+modified scripts:
+- fastq_to_tsv.py
+- cluster_embeddings.py
+
+
+fastq_to_tsv.py:
+- added regex compiler for correct handeling of labels from iss simulated reads format
+    iss adds _number_0\1 or \2 to label
+
+cluster_embeddings.py:
+- Added deterministic label encoding for clustering evaluation (KMeans, ARI, etc.)
+    Before:
+    label2id = {l: i for i, l in enumerate(set(labels))}
+    labels_numeric = np.array([label2id[l] for l in labels])
+    Label-to-ID assignment could vary between runs due to the unordered nature of Python sets.
+
+    After:
+    Sorting the set of labels ensures that the numeric ID assigned to each species remains consistent.
+    To ensure reproducibility and interpretability, class labels are mapped to numeric IDs using a deterministic ordering of unique labels.
+    This guarantees stable label-to-ID assignments across executions and ensures that clustering results and evaluation metrics remain meaningful.
+
+- added check if numb of labels match number of embeddings
+
+!!!!!PROBLEM TO CHECK:
+not actual purity is calculated in cluster_embeddings.py
+
+Purity:
+Purity = (1/N) × Σ max_j(n_ij)
+For each cluster i: Find the most frequent class j
+Sum the count of these dominant samples
+Divide by total number N
+Measures how "pure" the clusters are (highest proportion of the dominant class per cluster)
+
+Homogeneity Score
+H(C|K) = conditional entropy of classes given the clusters
+H(C) = entropy of the class distribution
+Based on information theory
+Measures whether all clusters contain only samples from a single class (0-1 normalized)
+
+Purity has the disadvantage that it becomes artificially high with many small clusters. Homogeneity is more robust, but Purity is more common in the clustering evaluation literature.
+
+!!!KMEAN CLUSTERING PARAMETER CHECK
+KMeans(
+    n_clusters = number_of_species,
+    init = starting position:
+    random starts at random cluster centroids
+    -> can lead slow convergence, bad local minima and instable results
+    kmeans++: selects initial cluster centroids using sampling based on an empirical probability distribution of the points’ contribution to the overall inertia. This technique speeds up convergence. The algorithm implemented is “greedy k-means++”. It differs from the vanilla k-means++ by making several trials at each sampling step and choosing the best centroid among them.
+    -> choses starting clsuter centroids that are distant and creates more stable clusters
+    n_init = how many times kmeans starts over. The final results is the best output of n_init consecutive runs in terms of inertia. Several runs are recommended for sparse high-dimensional problems
+    When n_init='auto', the number of runs depends on the value of init: 10 if using init='random' or init is a callable; 1 if using init='k-means++' or init is an array-like. ,
+    max_iter,
+    random_state
+)

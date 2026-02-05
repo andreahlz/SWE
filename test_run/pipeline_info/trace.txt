@@ -1,2 +1,6 @@
 task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	f7/f4d0d7	49583	download_fasta (ncbi-genomes)	FAILED	1	2026-02-05 20:30:52.219	257ms	163ms	-	-	-	-	-
+1	2e/e41462	55161	download_fasta (ncbi-genomes)	COMPLETED	0	2026-02-05 22:25:52.981	11.2s	10.9s	9.0%	44.6 MB	54.2 MB	13 MB	26.3 MB
+2	ba/b0b9a1	55738	process_fasta (1)	COMPLETED	0	2026-02-05 22:26:04.514	5.1s	4.8s	19.3%	28.6 MB	32.6 MB	53.6 MB	52.6 MB
+4	2a/51552a	56047	short_reads (1)	COMPLETED	0	2026-02-05 22:26:10.017	10.4s	9.9s	44.0%	265.2 MB	1.1 GB	110 MB	42.5 MB
+5	b9/a9c745	57133	process_read_pipeline:converting_reads_format (1)	FAILED	1	2026-02-05 22:26:20.747	1.1s	1s	-	-	-	-	-
+3	f9/f0075b	56060	long_reads (1)	ABORTED	-	2026-02-05 22:26:10.268	-	-	-	-	-	-	-
