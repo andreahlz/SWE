@@ -6,7 +6,6 @@ Requirements: pip install python-dotenv
 from dotenv import dotenv_values
 from pathlib import Path
 
-
 def read_abundances(input_file):
     """Read abundance values from input.txt"""
     abundances = {}
@@ -65,7 +64,9 @@ def main():
     newheader_dir = Path("..") / config["newheader_dir"]
     target_coverage = int(config["target_coverage"])
     short_read_length = int(config["short_read_length"])
-    long_read_length = int(config["mean_length"])  
+    long_read_length = int(config["mean_length"]) 
+    txt_short_output = Path("..") / config["coverage_short_txt"] 
+    txt_long_output = Path("..") / config["coverage_long_txt"] 
     
     abundances = read_abundances(input_file)
     
@@ -80,26 +81,41 @@ def main():
     print(f"METAGENOMIC READ CALCULATION FOR {target_coverage}X COVERAGE")
     print("=" * 60)
     
+    f_short = open(txt_short_output, 'w', newline='')
+    f_long = open(txt_long_output, 'w', newline='')
+
     print(f"\n### SHORT READS ({short_read_length} bp) ###")
     total_short_reads = 0
     for accession, data in genomes.items():
         effective_size = data["size"] * data["abundance"]
         reads_needed = (target_coverage * effective_size) / short_read_length
         total_short_reads += reads_needed
+
         print(f"{accession:40} {int(reads_needed):>10,} reads")
-    
+        f_short.write(f"{accession:40} {int(reads_needed):>10,} \n")
+
     print(f"\n{'TOTAL SHORT READS':40} {int(total_short_reads):>10,} reads")
-    
+
+
     print(f"\n### LONG READS ({long_read_length/1000:.0f} kb) ###")
     total_long_reads = 0
     for accession, data in genomes.items():
         effective_size = data["size"] * data["abundance"]
         reads_needed = (target_coverage * effective_size) / long_read_length
         total_long_reads += reads_needed
+
         print(f"{accession:40} {int(reads_needed):>10,} reads")
+        f_long.write(f"{accession:40} {int(reads_needed):>10,} \n")
+
     
     print(f"\n{'TOTAL LONG READS':40} {int(total_long_reads):>10,} reads")
 
+  
+    print(f"  ✓ Saved coverage info for simulating short reads to {txt_short_output}")
+    print(f"  ✓ Saved coverage info for simulating long reads to {txt_long_output}")
+
+    f_short.close()
+    f_long.close()
 
 if __name__ == "__main__":
     main()
