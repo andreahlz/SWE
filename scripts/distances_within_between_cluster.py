@@ -3,24 +3,13 @@ import argparse
 import numpy as np
 from scipy.spatial.distance import cdist
 
-def calc_within_cluster_distances(centroid,cluster_data_points):
-    if type(cluster_data_points) == pd.DataFrame:
-        distances = np.linalg.norm(cluster_data_points-centroid,axis=1)
-        return distances,sum(distances)  
-    else:
-        distances = np.array([np.linalg.norm(cluster_data_points - centroid)])
-        return distances,distances.sum()
-
 def main(args):
-    labels = pd.read_csv(args.label_file)
     label_file = open(args.label_file,'r')
     labels = [i.rstrip("\n") for i in label_file.readlines()][1:]
     distances = []
     embedding = np.load(args.embedding_file) 
-    embedding_transposed = embedding.transpose()
     data=pd.DataFrame(embedding,index=labels)
     labels_set = set(labels) 
-    mean_within_cluster_distances = []
     #calculate centroids
     centroids = {lab:data.loc[[lab]].mean() for lab in labels_set}
     distances = np.empty(len(data))
