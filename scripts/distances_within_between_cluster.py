@@ -40,14 +40,14 @@ def main(args):
              distances=distances,true_label = labels)
 
 if __name__=="__main__":
-    args = argparse.Namespace(
-        embedding_file = '/home/barbara/SWE/data/distances_test/test_run_processed_emb.npy',
-        label_file='/home/barbara/SWE/data/distances_test/test_run_processed_labels.txt',
-        outfile = 'calculated_distances.npz'
-    )
-    # parser = argparse.ArgumentParser(description='Calculate distances within and between clusters')
-    # parser.add_argument('--embedding_file', type=str, help='Path to the embedding npy file')
-    # parser.add_argument('--label_file', type=str, help='Label file containing two columns. First for true label, second for predicted label')
-    # parser.add_argument('--outfile',type=str,default='calculated_distances.npz',help='Path tp npz file to save calculated distances.')
-    # args = parser.parse_args()
+    # args = argparse.Namespace(
+    #     embedding_file = '/home/barbara/SWE/data/distances_test/test_run_processed_emb.npy',
+    #     label_file='/home/barbara/SWE/data/distances_test/test_run_processed_labels.txt',
+    #     outfile = 'calculated_distances.npz'
+    # )
+    parser = argparse.ArgumentParser(description='Calculate distances within and between clusters')
+    parser.add_argument('--embedding_file', type=str, help='Path to the embedding npy file')
+    parser.add_argument('--label_file', type=str, help='Label file containing two columns. First for true label, second for predicted label')
+    parser.add_argument('--outfile',type=str,default='calculated_distances.npz',help='Path tp npz file to save calculated distances.')
+    args = parser.parse_args()
     main(args)
