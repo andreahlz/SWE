@@ -155,7 +155,11 @@ process long_reads {
             --reference "${genome_file}" \
             --quantity "${coverage}x" \
             --length !{params.mean_length_long},!{params.length_stdev_long} \
-            --seed !{params.seed_long} \
+            --identity !{params.identity} \
+            --error_model !{params.error_model} \
+            --junk_reads 0 \
+            --random_reads 0 \
+            --chimeras 0 \
             > "${temp_dir}/${genome_name}.fastq"
     done
     
@@ -163,9 +167,11 @@ process long_reads {
     echo "Created FASTQ files:"
     ls -lh "${temp_dir}"/*.fastq
     
-    echo ""
-    echo "Combining reads..."
-    cat "${temp_dir}"/*.fastq > "${output_dir}/${file_name}.fastq"
+    #echo ""
+    #echo "Combining reads..."
+    #cat "${temp_dir}"/*.fastq > "${output_dir}/${file_name}.fastq"
+    echo "Shuffling and combining reads..."
+    cat "${temp_dir}"/*.fastq | paste - - - - | shuf --random-source=<(yes 42) | tr '\t' '\n' > "${output_dir}/${file_name}.fastq"
 
     echo "Cleaning up..."
     rm -rf "${temp_dir}"
@@ -286,19 +292,35 @@ process visualization_embeddings{
             --output_file "${embeddings_stand_npy.simpleName}.png"
     """
 }
-process visualization_cluster_distances{
-    publishDir "${params.output_base}/${read_type}/visualizations",mode:'copy' 
+process cluster_distance_calculations{
+    publishDir "${params.output_base}/${read_type}/clustering",mode:'copy' 
     input:
         tuple val(read_type), path(embeddings_npy), path(labels_txt)
     output:
-        tuple val(read_type), path("${embeddings_npy.simpleName}_cluster_distances.png")
+        tuple val(read_type), path("${embeddings_npy.simpleName}_${read_type}_cluster_distances.npz")
+    script:
+    """
+    
+    python3 ${params.py_cluster_dist} \
+            --embedding_file ${embeddings_npy} \
+            --label_file ${labels_txt} \
+            --outfile "${embeddings_npy.simpleName}_${read_type}_cluster_distances.npz"
+    """
+}
+process cluster_distance_visualization{
+    publishDir "${params.output_base}/comparison",mode:'copy' 
+    input:
+        path short_reads_distances_npz
+        path long_reads_distances_npz
+    output:
+        path "cluster_comparison.png"
     script:
     """
     
     python3 ${params.py_visualization_cluster_dist} \
-            --embedding_file ${embeddings_npy} \
-            --label_file ${labels_txt} \
-            --outfile "${embeddings_npy.simpleName}_cluster_distances.png"
+            --file_1 ${short_reads_distances_npz} \
+            --file_2 ${long_reads_distances_npz} \
+            --result_png "cluster_comparison.png"
     """
 }
 workflow process_read_pipeline {
@@ -331,8 +353,11 @@ workflow process_read_pipeline {
     //tuple val(read_type), path(embeddings_stand_npy), path(labels_txt), path(kmeans_results)
     viz_input=emb_outputs[1].join(emb_outputs[2]).join(kmeans_out[0])
     visualization_embeddings(viz_input)
-    //viz_cluster_input = emb_outputs[0].join(emb_outputs[2])
-    //visualization_cluster_distances(viz_cluster_input)
+    calc_dist_cluster_input = emb_outputs[0].join(emb_outputs[2])
+    dist_out = cluster_distance_calculations(calc_dist_cluster_input)
+    emit:
+        distances = dist_out
+
 }
 workflow{
     println "current directory ${projectDir}"
@@ -353,5 +378,10 @@ workflow{
     long_ch  = long_reads(processed_fastas[1], input_ch)
 
     reads_ch = short_ch.mix(long_ch)
-    process_read_pipeline(reads_ch)
+    distances_ch = process_read_pipeline(reads_ch).distances
+    // distances_ch: tuple(read_type, npz)
+
+    short_npz = distances_ch.filter{ it[0] == 'short_reads' }.map{ it[1] }.first()
+    long_npz  = distances_ch.filter{ it[0] == 'long_reads'  }.map{ it[1] }.first()
+    cluster_distance_visualization(short_npz,long_npz)
 }

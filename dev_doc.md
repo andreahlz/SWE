@@ -311,3 +311,25 @@ KMeans(
     max_iter,
     random_state
 )
+
+### update branch: lisc pipeline 08.02.2026
+new files from barbara_only_relevent branch:
+- compare_distances.py
+modified files:
+- distances_within_between_cluster.py (barbara_only_relevent branch)
+- nextflow.config
+- parallized_pipeline.nf
+- compare_distances.py (2 small changes)
+
+parallized_pipeline.nf:
+- added to new processes to pipeline
+- changes in long reads simulation process: 
+    1. Long reads contained random_seq labels because Badread generates 1% artifact reads by default
+    fixed by: badread simulate \
+    --junk_reads 0 \
+    --random_reads 0 \
+    --chimeras 0 \
+    -> Explicitly sets all artifact types to 0% and these artifact reads get labeled as random_seq in the output
+    also added other parameters eventhough we use defaults just so user can easily change settings
+    2. Only 1-2 Species in long_reads:
+        Input had 8 species, but Long reads output showed only 1-2 species (e.g., 1027 reads of GCF_000025985.1, 973 of GCF_000196555.1). Badread generates separate FASTQ files per genome and then files are combined alphabetically then get_n_lines onnly got first n reads which were all same species added a shuffly step before combining reads
