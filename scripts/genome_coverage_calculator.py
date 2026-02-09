@@ -92,7 +92,7 @@ def main():
         total_short_reads += reads_needed
 
         print(f"{accession:40} {int(reads_needed):>10,} reads")
-        f_short.write(f"{accession:40} {int(reads_needed):>10,} \n")
+        f_short.write(f"{accession:40} {int(reads_needed):>10} \n")
 
     print(f"\n{'TOTAL SHORT READS':40} {int(total_short_reads):>10,} reads")
 
