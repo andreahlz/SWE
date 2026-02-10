@@ -92,7 +92,7 @@ def main():
         total_short_reads += reads_needed
 
         print(f"{accession:40} {int(reads_needed):>10,} reads")
-        f_short.write(f"{accession:40} {int(reads_needed):>10} \n")
+    f_short.write(f"{total_short_reads:.0f} \n")
 
     print(f"\n{'TOTAL SHORT READS':40} {int(total_short_reads):>10,} reads")
 
@@ -104,11 +104,11 @@ def main():
         reads_needed = (target_coverage * effective_size) / long_read_length
         total_long_reads += reads_needed
 
-        print(f"{accession:40} {int(reads_needed):>10,} reads")
-        f_long.write(f"{accession:40} {int(reads_needed):>10,} \n")
+        print(f"{accession:40} {int(reads_needed):>10} reads")
+        f_long.write(f"{accession:40} {int(reads_needed):>10} \n")
 
     
-    print(f"\n{'TOTAL LONG READS':40} {int(total_long_reads):>10,} reads")
+    print(f"\n{'TOTAL LONG READS':40} {int(total_long_reads):>10} reads")
 
   
     print(f"  ✓ Saved coverage info for simulating short reads to {txt_short_output}")
