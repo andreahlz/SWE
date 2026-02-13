@@ -17,13 +17,15 @@ from sklearn.cluster import KMeans
 def load_embeddings_from_npy(npy_file,label_file):
     embeddings = np.load(npy_file)
     with open(label_file, 'r') as f:
-        labels = f.read().strip().split('\n')
+
+        lines = f.read().strip().split('\n')
+        labels = lines[1:] #header skip
     return embeddings, labels
 
 
 def prepare_labels(labels):
     # convert labels to numeric values  
-    label2id = {l: i for i, l in enumerate(set(labels))}
+    label2id = {l: i for i, l in enumerate(sorted(set(labels)))}
     labels_numeric = np.array([label2id[l] for l in labels])
     num_clusters = len(label2id)
 
@@ -96,6 +98,9 @@ def save_results(results, original_labels, output_file):
 def main(args):
     # Load data
     embeddings, original_labels = load_embeddings_from_npy(args.embedding_file, args.label_file)
+    #check if embedding number matches labels number (check for missing data whhich would make results unreliable)
+    if embeddings.shape[0] != len(original_labels):
+        raise ValueError(f"Mismatch: embeddings = {embeddings.shape[0]} labels = {len(original_labels)}")
     # Prepare labels
     labels_numeric, num_clusters,_ = prepare_labels(original_labels)
     # Clustering
