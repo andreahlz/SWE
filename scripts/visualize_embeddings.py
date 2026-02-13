@@ -14,7 +14,8 @@ from sklearn.manifold import TSNE
 def load_embeddings_from_npy(npy_file,label_file):
     embeddings = np.load(npy_file)
     with open(label_file, 'r') as f:
-        labels = f.read().strip().split('\n')
+        lines= f.read().strip().split('\n')
+        labels= lines[1:]
     return embeddings, labels
 
 def load_clustering_results(clustering_csv_file):
@@ -66,7 +67,7 @@ def create_visualization(embeddings_2d,true_labels,predicted_labels, output_file
     
     # Plot 2: Predicted labels (K-means)
     ax[1].scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], c=colors_pred, alpha=0.6)
-    ax[1].set_title('K-means Predicted Clustering', fontsize=14)
+    ax[1].set_title('K-means Clustering', fontsize=14)
     ax[1].set_xlabel('t-SNE dimension 1')
     ax[1].set_ylabel('t-SNE dimension 2')
     

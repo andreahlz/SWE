@@ -2,7 +2,10 @@ from Bio import SeqIO
 from pathlib import Path
 import sys
 import argparse
+import re
 
+#iss hangs _number_number and /1 or /2 this pattern is not part of the accesion id and should not be included
+iss_re = re.compile(r'^(.+?)_\d+_\d+(?:/\d+)?$')
 
 def fastq_to_clustering_tsv(fastq_file,output_file=None):
     fastq_path = Path(fastq_file)
@@ -36,7 +39,11 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
                 else:
                     raise ValueError(f"Unexpected Badread format: {description}")
             else:
-                label = record.id.rsplit("_", 1)[0]
+                m = iss_re.match(record.id)
+                if m:
+                    label = m.group(1)
+                else:
+                     raise ValueError(f"Unexpected InSilicoSeq format: id={record.id} desc={description}")
 
             file.write(f"{record.seq}\t{label}\n")
 
