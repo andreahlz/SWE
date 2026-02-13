@@ -3,7 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="${script_dir%/scripts}"
-pipeline_script="${project_root}/scripts/parallized_pipeline.nf"
+pipeline_script="${project_root}/scripts/final_pipeline.nf"
 
 Job_name=SWE_nextflow_pipeline
 cpus=4
