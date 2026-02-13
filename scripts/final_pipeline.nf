@@ -56,20 +56,43 @@ process process_fasta{
         --multifasta_output "${params.dataset_name}.fna"
 """
 }
-//
-/*
-* Apply Insilicoseq to fasta file
-*/ 
+
+process calculate_coverage_for_short_reads {
+    publishDir "${params.output_base}/coverage", mode: 'copy'
+    
+    input:
+        path processed_fna
+        path input_txt
+        
+    output:
+        path "coverage_short.txt"
+    
+    script:
+    """
+    mkdir -p processed
+    mv *.fna processed/
+    
+    python3 ${params.py_coverage_calc} \
+        --input_file "${input_txt}" \
+        --newheader_fastas_dir processed \
+        --target_coverage "${params.target_coverage}" \
+        --short_read_length "${params.short_read_length}" \
+        --txt_short_output coverage_short.txt \
+    """
+}
+
 process short_reads {
     publishDir "${params.output_base}/short_reads/simulated_reads", mode: 'copy'
     input:
         path fasta_file
         path input_txt
+        path coverage_short
     output:
         tuple val('short_reads'), path("${fasta_file.baseName}.fastq")
         
     script:
         """
+        n_reads=\$(cat ${coverage_short})
         tail -n +2 "${input_txt}" > abundance.txt
         echo 'starting read generation for ${fasta_file.baseName}'
         echo 'fasta_file name = ${fasta_file}'
@@ -77,10 +100,11 @@ process short_reads {
             --genomes ${fasta_file} \
             --abundance_file abundance.txt \
             --model ${params.model_short} \
-            --n_reads ${params.n_reads_short} \
+            --n_reads \${n_reads} \
             --output temp_reads
         
-        cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
+        #cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
+        cat temp_reads_R1.fastq temp_reads_R2.fastq | paste - - - - | shuf --random-source=<(yes 42) | tr '\t' '\n' > ${fasta_file.baseName}.fastq
         """
 }
 process long_reads {
@@ -96,7 +120,6 @@ process long_reads {
     
     shell:
     '''
-    #!/bin/bash
     set -euo pipefail
     
     output_dir="."
@@ -105,11 +128,12 @@ process long_reads {
     mkdir -p "${temp_dir}"
 
     # Read abundances
-    declare -A abundances
-    while IFS=$'\\t' read -r species abundance; do
-        [[ "$species" == "species" ]] && continue
-        abundances["$species"]=$abundance
-    done < "!{input_txt}"
+    #declare -A abundances
+    #while IFS=$'\\t' read -r species abundance; do
+    #   [[ "$species" == "species" ]] && continue
+    #    abundances["$species"]=$abundance
+    #done < "!{input_txt}"
+    
 
     # Split multifasta
     echo "Splitting multifasta into individual genomes..."
@@ -146,14 +170,14 @@ process long_reads {
         [[ ! -f "$genome_file" ]] && continue
         
         genome_name=$(basename "$genome_file" .fna)
-        abundance=${abundances[$genome_name]:-0.01}
-        coverage=$(echo "$abundance * 10" | bc -l | awk '{printf "%.2f", $0}')
         
-        echo "  ${genome_name}: abundance=${abundance}, coverage=${coverage}x"
+        #abundance=${abundances[$genome_name]:-0.01}
+        #n_reads=$(grep "^${genome_name}" ${coverage_long} | awk '{gsub(/,/, "", $2); print $2}')
+        
         
         badread simulate \
             --reference "${genome_file}" \
-            --quantity "${coverage}x" \
+            --quantity "!{params.target_coverage}x" \
             --length !{params.mean_length_long},!{params.length_stdev_long} \
             --identity !{params.identity} \
             --error_model !{params.error_model} \
@@ -173,11 +197,12 @@ process long_reads {
     echo "Shuffling and combining reads..."
     cat "${temp_dir}"/*.fastq | paste - - - - | shuf --random-source=<(yes 42) | tr '\t' '\n' > "${output_dir}/${file_name}.fastq"
 
+
     echo "Cleaning up..."
     rm -rf "${temp_dir}"
     
     echo ""
-    echo " Done! Output: ${file_name}.fastq"
+    echo "✓ Done! Output: ${file_name}.fastq"
     '''
 }
 //Convert FASTQ to TSV format
@@ -361,20 +386,18 @@ workflow process_read_pipeline {
 }
 workflow{
     println "current directory ${projectDir}"
-    println "Input FASTQ: ${params.input_fastq}"
     println "Output dir:  ${params.output_base}"
-    println "FASTQ->TSV script: ${params.py_fastq_to_tsv}"
-    println "Embedding script:  ${params.py_embedding_calc}"
     println "DNABERT-S dir:     ${params.test_model_dir}"
-    println projectDir
     data_dir = "${projectDir.parent}/data"
 
     input_ch = Channel.fromPath(params.input_txt)
 
     fasta_files = download_fasta(input_ch)
     processed_fastas = process_fasta(fasta_files.collect(), input_ch)
+    // Calculate coverage
+    coverage_file_SHORT = calculate_coverage_for_short_reads(processed_fastas[0].collect(), input_ch)
 
-    short_ch = short_reads(processed_fastas[1], input_ch)
+    short_ch = short_reads(processed_fastas[1], input_ch, coverage_file_SHORT)
     long_ch  = long_reads(processed_fastas[1], input_ch)
 
     reads_ch = short_ch.mix(long_ch)
