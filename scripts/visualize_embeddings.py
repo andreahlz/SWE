@@ -31,7 +31,7 @@ def dimreduct_TSNE(X=np.array):
     #run it several times, find the value, where kl divergence does not improve any more (KL divergence low indicates better results)
     #perplexity sets the effective number of neighbours that each point is attracted to
     #Kullback-Leibler (KL) divergence is a measure of the difference between two probability distributions (low and high dimensional)
-    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=1).fit_transform(X)
+    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=100).fit_transform(X)
     return X_embedded
 
 def create_visualization(embeddings_2d,true_labels,predicted_labels, output_file):

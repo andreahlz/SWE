@@ -40,8 +40,8 @@ def perform_kmeans(embeddings, labels, num_clusters, random_seeds=[0, 1, 2, 3, 4
         kmeans = KMeans(n_clusters=num_clusters,
                         random_state=random_seed,
                         max_iter=1000,
-                        init="random",
-                        n_init=3)
+                        init="k-means++",
+                        n_init=10)
         kmeans.fit(embedding_norm)
         preds_clustering = kmeans.labels_
         purity = sklearn.metrics.homogeneity_score(labels, preds_clustering)
