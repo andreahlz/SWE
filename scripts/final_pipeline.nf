@@ -77,7 +77,7 @@ process calculate_coverage_for_short_reads {
         --newheader_fastas_dir processed \
         --target_coverage "${params.target_coverage}" \
         --short_read_length "${params.short_read_length}" \
-        --txt_short_output coverage_short.txt \
+        --txt_short_output coverage_short.txt 
     """
 }
 
@@ -101,10 +101,10 @@ process short_reads {
             --abundance_file abundance.txt \
             --model ${params.model_short} \
             --n_reads \${n_reads} \
+            --seed ${params.seeds_sim} \
             --output temp_reads
         
-        #cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
-        cat temp_reads_R1.fastq temp_reads_R2.fastq | paste - - - - | shuf --random-source=<(yes 42) | tr '\t' '\n' > ${fasta_file.baseName}.fastq
+        cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
         """
 }
 process long_reads {
@@ -181,6 +181,7 @@ process long_reads {
             --length !{params.mean_length_long},!{params.length_stdev_long} \
             --identity !{params.identity} \
             --error_model !{params.error_model} \
+            --seed !{params.seeds_sim} \
             --junk_reads 0 \
             --random_reads 0 \
             --chimeras 0 \
@@ -193,16 +194,15 @@ process long_reads {
     
     #echo ""
     #echo "Combining reads..."
-    #cat "${temp_dir}"/*.fastq > "${output_dir}/${file_name}.fastq"
-    echo "Shuffling and combining reads..."
-    cat "${temp_dir}"/*.fastq | paste - - - - | shuf --random-source=<(yes 42) | tr '\t' '\n' > "${output_dir}/${file_name}.fastq"
-
+    cat "${temp_dir}"/*.fastq > "${output_dir}/${file_name}.fastq"
+    
+    
 
     echo "Cleaning up..."
     rm -rf "${temp_dir}"
     
     echo ""
-    echo "✓ Done! Output: ${file_name}.fastq"
+    echo "Done! Output: ${file_name}.fastq"
     '''
 }
 //Convert FASTQ to TSV format
@@ -355,22 +355,25 @@ workflow process_read_pipeline {
     //FASTQ to TSV
     tsv_ch = converting_reads_format(fastq_tuple)
 
+    tsv_for_embddings = tsv_ch
     //TSV shorter (for testing)
-    tsv_processed = get_n_lines_of_tsv(tsv_ch)
+    if( params.use_get_n_lines ) {
+        tsv_for_embddings = get_n_lines_of_tsv(tsv_ch)
+    }
 
     //Calculate embeddings
-    emb_outputs = calculate_embeddings(tsv_processed)
+    emb_outputs = calculate_embeddings(tsv_for_embddings)
     // emb_outputs[0] = tuple(read_type, emb.npy)
     // emb_outputs[1] = tuple(read_type, emb_stand.npy)
     // emb_outputs[2] = tuple(read_type, labels.txt)
 
     // keans clustering
-    kmenas_input = emb_outputs[0].join(emb_outputs[2])
-    //kmenas_input=    
+    kmeans_input = emb_outputs[0].join(emb_outputs[2])
+    //kmeans_input=    
     // tuple value(read_type), path(embedding_npy)
     // tuple value(read_type), path(labels_txt)
     
-    kmeans_out=kmeans_clustering(kmenas_input)
+    kmeans_out=kmeans_clustering(kmeans_input)
     // tuple value(read_type), path("${embedding_npy.simpleName}_kmeans_results.csv")
     // tuple value(read_type), path("${embedding_npy.simpleName}_kmeans_results_metrics.txt")
 
