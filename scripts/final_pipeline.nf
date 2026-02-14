@@ -261,7 +261,7 @@ process calculate_embeddings {
     """
 }
 process checkout_all_outputs {
-    echo true
+    debug true
     input:
         path emb_file
         path stand_file
@@ -393,7 +393,7 @@ workflow{
     println "DNABERT-S dir:     ${params.test_model_dir}"
     data_dir = "${projectDir.parent}/data"
 
-    input_ch = Channel.fromPath(params.input_txt)
+    input_ch = channel.fromPath(params.input_txt)
 
     fasta_files = download_fasta(input_ch)
     processed_fastas = process_fasta(fasta_files.collect(), input_ch)
