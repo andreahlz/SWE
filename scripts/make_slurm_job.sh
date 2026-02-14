@@ -28,7 +28,7 @@ cat > "${job_file}" <<EOF
 #SBATCH --time=${time}
 
 #conda enviroment
-conda activate readsdnaberts
+conda activate env
 
 
 export NXF_HOME="${project_root}/.nextflow"
