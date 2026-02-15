@@ -7,7 +7,7 @@ pipeline_script="${project_root}/scripts/final_pipeline.nf"
 
 Job_name=SWE_nextflow_pipeline
 cpus=4
-memory=8GB
+memory=32GB
 time=2-00:00:00
 
 mkdir -p "${project_root}/slurm_scripts" "${project_root}/logs"
