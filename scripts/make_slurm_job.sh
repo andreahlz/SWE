@@ -28,6 +28,7 @@ cat > "${job_file}" <<EOF
 #SBATCH --time=${time}
 
 #conda enviroment
+module load Conda/Miniforge3
 conda activate env
 
 
