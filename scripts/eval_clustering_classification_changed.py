@@ -25,6 +25,7 @@ from utils_changed import get_embedding
 
 # Set debug mode; true if args are hardcoded
 DEBUG_MODE = False
+print('test')
 device = "linux"
 # muss ich noch am ende rauslöschen
 if device == "windows":
