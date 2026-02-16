@@ -59,7 +59,7 @@ def main():
     embedding_standard = StandardScaler().fit_transform(embedding)
     #converts the values of the embedding into differences to the mean in standard deviations
     #reduce dimensionality of current embedding, save low dimensional embedding in dictionary
-
+    print('test')
     #instead of csv using npy
     np.save(os.path.join(output_dir, f"{base_name}_emb.npy"),  embedding)
     np.save(os.path.join(output_dir, f"{base_name}_emb_stand.npy"), embedding_standard)
