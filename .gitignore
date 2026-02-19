@@ -13,6 +13,7 @@ data_test
 .nextflow/
 .nextflow.log*
 work/
+nextflow_work
 
 #dnaberts
 DNABERT-S
@@ -159,5 +160,9 @@ venv.bak/
 *.fastq
 *.tmp*
 *.vcf
-
+*.tsv
+*.npy
+*.npz
+*.err
+*.out
 

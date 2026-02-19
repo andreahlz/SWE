@@ -19,6 +19,6 @@ dependencies:
   - python-dotenv
   - einops
   - pip:
-      - triton
-      - torch
+      - triton==2.0.0.dev20221202
+      - torch==1.13.1
       - transformers==4.27

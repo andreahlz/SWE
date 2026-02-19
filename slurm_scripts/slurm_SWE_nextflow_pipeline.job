@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+#SBATCH --job-name=SWE_nextflow_pipeline
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=8GB
+#SBATCH --mail-type=BEGIN,END,TIME_LIMIT_50,TIME_LIMIT_80,TIME_LIMIT
+#SBATCH --output=/lisc/data/scratch/course/2025w053531/SWE/logs/%x-%j.out
+#SBATCH --error=/lisc/data/scratch/course/2025w053531/SWE/logs/%x-%j.err
+#SBATCH --time=05:00:00
+
+#conda enviroment
+module load Conda/Miniforge3
+conda activate env
+
+
+export NXF_HOME="/lisc/data/scratch/course/2025w053531/SWE/.nextflow"
+export NXF_WORK="/lisc/data/scratch/course/2025w053531/SWE/nextflow_work"
+
+#into projct root
+cd /lisc/data/scratch/course/2025w053531/SWE
+
+#start simulation
+nextflow run /lisc/data/scratch/course/2025w053531/SWE/scripts/final_pipeline.nf -profile lisc -resume

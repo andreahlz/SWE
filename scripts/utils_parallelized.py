@@ -1,10 +1,12 @@
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import numpy as np
 import transformers
 import torch
 import torch.utils.data as util_data
 import torch.nn as nn
 import tqdm
-import os
 
 from scipy.optimize import linear_sum_assignment
 
@@ -32,7 +34,7 @@ def get_embedding(dna_sequences,
         "hyenadna": 100,
         "dnabert2": 20,
         "nt": 64,
-        "test": 20,
+        "test": 4,
     }
 
     batch_size = model2batch_size[model]
@@ -170,11 +172,13 @@ def calculate_llm_embedding(dna_sequences, model_name_or_path, model_max_length=
         model = transformers.AutoModelForMaskedLM.from_pretrained(
             model_name_or_path,
             trust_remote_code=True,
+            torch_dtype=torch.float16,
         ) 
     else:
         model = transformers.AutoModel.from_pretrained(
                 model_name_or_path,
                 trust_remote_code=True,
+                torch_dtype=torch.float16,
             )
     
 
@@ -326,6 +330,3 @@ def compute_class_center_medium_similarity(embeddings, labels):
     
     
     return percentile_values
-
-
-
