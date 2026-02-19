@@ -1,0 +1,17 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	a1/d3fedf	1643014	download_fasta (ncbi-genomes)	CACHED	0	2026-02-16 19:40:54.079	18.7s	11.1s	5.6%	40.5 MB	58.8 MB	12.7 MB	26.3 MB
+2	61/853acd	1643015	process_fasta (1)	CACHED	0	2026-02-16 19:41:13.117	4.6s	407ms	89.0%	12.5 MB	36.5 MB	53.6 MB	52.6 MB
+4	f3/2b014f	1643016	calculate_coverage_for_short_reads (1)	CACHED	0	2026-02-16 19:41:18.090	4.7s	507ms	68.0%	8.1 MB	24.9 MB	27.3 MB	1.1 KB
+5	f0/63f0d4	1643018	short_reads (1)	CACHED	0	2026-02-16 19:41:22.847	3m 50s	3m 46s	194.6%	385.9 MB	3.3 GB	284.9 MB	296.7 MB
+6	af/8c0e1c	1643021	process_read_pipeline:converting_reads_format (1)	CACHED	0	2026-02-16 19:45:12.883	4.9s	3.4s	111.5%	41.1 MB	1.2 GB	84.7 MB	40.2 MB
+3	19/28b225	1651848	long_reads (1)	CACHED	0	2026-02-17 16:35:53.928	1h 3m 29s	1h 3m 25s	99.3%	246.2 MB	1.2 GB	738.3 MB	1 GB
+8	15/bf91b4	1651924	process_read_pipeline:converting_reads_format (2)	CACHED	0	2026-02-17 17:39:23.142	10s	6.6s	87.9%	44 MB	1.2 GB	527.4 MB	260.4 MB
+7	15/eb9811	1651849	process_read_pipeline:calculate_embeddings (1)	CACHED	0	2026-02-17 16:35:53.959	16m 24s	16m 16s	170.1%	3.7 GB	36.8 GB	1 GB	1.2 GB
+9	e2/367bc5	1653196	process_read_pipeline:calculate_embeddings (2)	CACHED	0	2026-02-18 20:43:12.922	4h 46m 39s	4h 46m 26s	101.8%	5.9 GB	135.3 GB	1.4 GB	341.3 MB
+11	30/409248	1651869	process_read_pipeline:cluster_distance_calculations (1)	CACHED	0	2026-02-17 16:52:18.148	24.8s	19.7s	85.6%	738.1 MB	1.6 GB	410.8 MB	8.6 MB
+13	ee/f81f36	1651870	process_read_pipeline:kmeans_clustering (1)	CACHED	0	2026-02-17 16:52:18.194	18m 5s	17m 59s	441.9%	1.7 GB	4.2 GB	419.8 MB	2.3 MB
+14	f5/13070d	1651891	process_read_pipeline:visualization_embeddings (1)	CACHED	0	2026-02-17 17:10:23.117	28m 20s	28m 16s	410.7%	2.9 GB	5.5 GB	460 MB	4.9 MB
+10	69/cf53aa	1653566	process_read_pipeline:cluster_distance_calculations (1)	COMPLETED	0	2026-02-19 02:21:36.404	8.1s	3.9s	111.2%	110.9 MB	1.2 GB	47.4 MB	1.2 MB
+15	a6/f81ead	1653568	cluster_distance_visualization	COMPLETED	0	2026-02-19 02:21:44.619	9.9s	5.1s	133.3%	134 MB	1.4 GB	48.7 MB	208.3 KB
+12	e9/cc8799	1653567	process_read_pipeline:kmeans_clustering (1)	COMPLETED	0	2026-02-19 02:21:36.459	53.1s	50.3s	410.3%	427.2 MB	2.9 GB	56.6 MB	389.4 KB
+16	d9/0e2bdc	1653572	process_read_pipeline:visualization_embeddings (2)	COMPLETED	0	2026-02-19 02:22:29.585	2m 10s	2m 5s	283.3%	538.1 MB	3.1 GB	67.7 MB	1.7 MB

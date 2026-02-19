@@ -1,0 +1,10 @@
+K-means Clustering Results
+Best Result (Seed 1:
+)ARI: 0.0998
+Purity: 0.2164
+Completeness: 0.1804
+Mean Results (across all seeds):
+  Purity       : 0.2162
+  Completeness : 0.1803
+  Ari          : 0.0997
+  Nmi          : 0.1966

@@ -7,7 +7,8 @@ __pycache__/
 *.so
 
 #testing files
-data_test
+data_test/genomes
+data_test/coverage
 
 #nextflow
 .nextflow/
