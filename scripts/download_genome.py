@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This script downloada genomes from NCBI by accession number
+This script downloads genomes from NCBI by accession number
 and reads accession IDs from input.txt
 
 Usage: python genome_download.py
