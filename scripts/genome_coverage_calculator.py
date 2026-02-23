@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """
+This script calculates the coverage for short reads by using 
+abundance from input.txt
+
+coverage = (target_coverage * effektive_size)/short_read_length
+effektive_size = len(sequence) * abundance
+
+Usage: python genome_coverage_calculator.py
+
 Requirements: pip install python-dotenv
 """
 

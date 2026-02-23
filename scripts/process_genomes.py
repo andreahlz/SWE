@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Process genome files:
+This script processes genome files:
 1. Extract headers and save to CSV
 2. Combine sequences within each file
 3. Add new headers with Accession ID

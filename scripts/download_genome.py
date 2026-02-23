@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Download genomes from NCBI by accession number
-Reads accession IDs from input.txt and uses config from config.env
+This script downloada genomes from NCBI by accession number
+and reads accession IDs from input.txt
 
 Usage: python genome_download.py
 
@@ -53,7 +53,7 @@ def download_genome(accession, output_dir, timeout):
             fna_files = [f for f in zf.namelist() if f.endswith('.fna')]
             
             if not fna_files:
-                print(f"  ✗ No FASTA file found in download")
+                print(f"No FASTA file found in download")
                 return False
             
             # Extract first .fna file
@@ -63,14 +63,14 @@ def download_genome(accession, output_dir, timeout):
             output_fasta = output_dir / f"{accession}.fna"
             output_fasta.write_bytes(fna_content)
             
-            print(f"  ✓ Saved to {output_fasta}")
+            print(f"Saved to {output_fasta}")
             return True
         
     except requests.exceptions.RequestException as e:
-        print(f"  ✗ Download failed: {e}")
+        print(f"Download failed: {e}")
         return False
     except Exception as e:
-        print(f"  ✗ Failed: {e}")
+        print(f"Failed: {e}")
         return False
 
 
@@ -111,7 +111,7 @@ def main(args):
         if download_genome(acc, output_dir, timeout):
             success += 1
     
-    print(f"\n✓ Downloaded {success}/{len(accessions)} genomes")
+    print(f"\nDownloaded {success}/{len(accessions)} genomes")
     
     
 
