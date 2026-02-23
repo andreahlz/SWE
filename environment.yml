@@ -19,5 +19,6 @@ dependencies:
   - python-dotenv
   - einops
   - pip:
+      - triton
       - torch
       - transformers==4.27

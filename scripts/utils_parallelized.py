@@ -32,7 +32,7 @@ def get_embedding(dna_sequences,
         "hyenadna": 100,
         "dnabert2": 20,
         "nt": 64,
-        "test": 20,
+        "test": 4,
     }
 
     batch_size = model2batch_size[model]

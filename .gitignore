@@ -13,9 +13,12 @@ data_test
 .nextflow/
 .nextflow.log*
 work/
+logs/
+nextflow_work/
 
 #dnaberts
 DNABERT-S
+*.zip
 
 # Distribution / packaging
 .Python
@@ -159,5 +162,9 @@ venv.bak/
 *.fastq
 *.tmp*
 *.vcf
-
+*.npy
+*.npz
+*.tsv
+*.csv
+*.fna
 
