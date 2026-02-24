@@ -1,14 +1,33 @@
 #!/usr/bin/env python3
 """
-This script processes genome files:
-1. Extract headers and save to CSV
-2. Combine sequences within each file
-3. Add new headers with Accession ID
-4. Create combined multi-fasta file
+Processes downloaded genome FASTA files for read simulation.
 
-Usage: python process_genomes.py
+For each genome:
+  - Concatenates all contigs into a single sequence
+  - Replaces the original FASTA header with the accession ID
+  - Saves re-headered files to the output directory
 
-Requirements: pip install python-dotenv
+Also produces:
+  - header_info.csv: mapping of accession ID to original headers and abundance
+  - A combined multi-FASTA file of all processed genomes
+
+Input:  directory of per-accession .fna files + input.txt with abundances
+Output: processed .fna files, header_info.csv, combined multi-FASTA
+
+Usage:
+    python process_genomes.py \
+        --input_file     data/input/input.txt \
+        --single_fastas_dir data/genomes/fasta_files \
+        --output_dir     data/genomes/processed \
+        --csv_output     data/genomes/processed/header_info.csv \
+        --multifasta_output data/genomes/processed/mockgut.fna
+
+Arguments:
+    --input_file        Tab-separated file with accession IDs and abundances (see Section 5)
+    --single_fastas_dir Directory containing the raw per-accession .fna files
+    --output_dir        Output directory for re-headered .fna files
+    --csv_output        Path for the output CSV mapping accessions to original headers
+    --multifasta_output Path for the combined multi-FASTA output file
 """
 
 import csv
@@ -91,7 +110,7 @@ def process_genome_file(fna_file, abundances, output_dir):
         for i in range(0, len(combined_sequence), 80):
             f.write(combined_sequence[i:i+80] + '\n')
     
-    print(f"  ✓ Processed {accession}: {len(sequences)} sequence(s) combined")
+    print(f"Processed {accession}: {len(sequences)} sequence(s) combined")
     
     return {
         'accession': accession,
@@ -106,7 +125,7 @@ def create_multifasta(input_dir, output_file):
         for fna_file in sorted(input_dir.glob("*.fna")):
             with open(fna_file) as f:
                 out.write(f.read())
-    print(f"✓ Created multi-fasta: {output_file}")
+    print(f"Created multi-fasta: {output_file}")
 
 
 def main(args):
@@ -132,7 +151,7 @@ def main(args):
     
     print("Step 1: Reading abundances...")
     abundances = read_abundances(input_file)
-    print(f"  Found {len(abundances)} accessions with abundance values\n")
+    print(f"Found {len(abundances)} accessions with abundance values\n")
     
     print("Step 2: Processing genome files...")
     csv_data = []
@@ -148,13 +167,13 @@ def main(args):
         writer = csv.DictWriter(f, fieldnames=['accession', 'headers', 'abundance'])
         writer.writeheader()
         writer.writerows(csv_data)
-    print(f"  ✓ Saved header info to {csv_output}")
+    print(f"Saved header info to {csv_output}")
     
     print(f"\nStep 4: Creating combined multi-fasta file...")
     multifasta_output.parent.mkdir(parents=True, exist_ok=True)
     create_multifasta(output_dir, multifasta_output)
     
-    print(f"\n✓ All done! Processed {len(csv_data)} genome files")
+    print(f"\nAll done! Processed {len(csv_data)} genome files")
 
 
 if __name__ == "__main__":
