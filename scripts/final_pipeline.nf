@@ -4,17 +4,27 @@
  * Pipeline: DNABERT-S Embedding Analysis Pipeline
  * Description: Converts FASTQ reads to TSV, calculates embeddings, performs clustering, and visualizes results
  * 
- * Workflow:
- * 1. converting_reads_format: FASTQ → TSV conversion
- * 2. calculate_embeddings: Generate DNABERT-S embeddings
- * 3. kmeans_clustering: Cluster embeddings using K-means
- * 4. visualization: Create t-SNE visualization of clusters
-
- usage: nextflow run pipeline.nf
+ * Downloads reference genomes, simulates short and long reads, computes
+ * DNABERT-S embeddings, performs k-means clustering, and visualises results.
+ * Short and long reads are processed in parallel via the shared subworkflow
+ * process_read_pipeline.
+ *
+ * Usage:
+ *   nextflow run final_pipeline.nf -profile test       # local testing
+ *   nextflow run final_pipeline.nf -profile lisc       # HPC (SLURM) runs via slurm job script
+ *  
+ * for lisc run: create job scrip via make_slurm_job.sh which scedules and runs pipeline
+ *
+ * in order to continue a run use -resume
+ * nextflow run final_pipeline.nf -profile test -resume
+ * 
+ * Configuration: nextflow.config
  */ 
 
 
-
+// Downloads per-accession genome FASTA files from NCBI using the accession
+// IDs listed in input_txt. Outputs one .fna file per genome.
+// timeout is set to 300 seconds meaning the request for NCBI API will wait for 300s before giving up
 process download_fasta{
     tag "ncbi-genomes"
     publishDir "${params.output_base}/genomes/fasta_files", mode: 'copy'
@@ -32,7 +42,9 @@ process download_fasta{
         --timeout 300
 """
 }
-
+// Concatenates contigs within each genome FASTA, replaces original headers
+// with the accession ID, and creates a combined multi-FASTA for read simulation.
+// Also writes header_info.csv mapping accessions to original headers.
 process process_fasta{
     publishDir "${params.output_base}/genomes", mode: 'copy'
     input:
@@ -56,7 +68,9 @@ process process_fasta{
         --multifasta_output "${params.dataset_name}.fna"
 """
 }
-
+// Calculates the number of short reads required per genome to reach
+// params.target_coverage given the genome size and params.short_read_length.
+// Writes the total read count to coverage_short.txt.
 process calculate_coverage_for_short_reads {
     publishDir "${params.output_base}/coverage", mode: 'copy'
     
@@ -80,7 +94,9 @@ process calculate_coverage_for_short_reads {
         --txt_short_output coverage_short.txt 
     """
 }
-
+// Simulates Illumina short reads from the multi-FASTA using
+// InSilicoSeq. Read count is taken from coverage_short.txt. All reads
+// are merged into a single FASTQ file
 process short_reads {
     publishDir "${params.output_base}/short_reads/simulated_reads", mode: 'copy'
     input:
@@ -107,6 +123,11 @@ process short_reads {
         cat temp_reads_R1.fastq temp_reads_R2.fastq > ${fasta_file.baseName}.fastq
         """
 }
+
+// Simulates Oxford Nanopore long reads using Badread. The multi-FASTA is
+// split into per-genome files with awk; Badread is run on each genome
+// separately at params.target_coverage depth. All per-genome FASTQs are
+// concatenated into a single output file.
 process long_reads {
     publishDir "${params.output_base}/long_reads/simulated_reads", mode: 'copy'
     
@@ -127,14 +148,7 @@ process long_reads {
     temp_dir="${output_dir}/temp"
     mkdir -p "${temp_dir}"
 
-    # Read abundances
-    #declare -A abundances
-    #while IFS=$'\\t' read -r species abundance; do
-    #   [[ "$species" == "species" ]] && continue
-    #    abundances["$species"]=$abundance
-    #done < "!{input_txt}"
-    
-
+ 
     # Split multifasta
     echo "Splitting multifasta into individual genomes..."
     awk -v outdir="${temp_dir}" '
@@ -164,7 +178,6 @@ process long_reads {
     ls -lh "${temp_dir}/"*.fna
 
     # Simulate reads
-    echo ""
     echo "Simulating long reads with Badread..."
     for genome_file in "${temp_dir}"/*.fna; do
         [[ ! -f "$genome_file" ]] && continue
@@ -188,24 +201,22 @@ process long_reads {
             > "${temp_dir}/${genome_name}.fastq"
     done
     
-    echo ""
-    echo "Created FASTQ files:"
+    #Created FASTQ files:
     ls -lh "${temp_dir}"/*.fastq
     
-    #echo ""
-    #echo "Combining reads..."
+    #Combining reads...
     cat "${temp_dir}"/*.fastq > "${output_dir}/${file_name}.fastq"
     
-    
 
-    echo "Cleaning up..."
+    #Cleaning up
     rm -rf "${temp_dir}"
     
-    echo ""
     echo "Done! Output: ${file_name}.fastq"
     '''
 }
-//Convert FASTQ to TSV format
+// Converts a FASTQ file to a two-column TSV (sequence, bin_id) where bin_id
+// is the true genome accession label extracted from the read header.
+// Supports both InSilicoSeq and Badread header formats.
 process converting_reads_format {
   publishDir "${params.output_base}/${read_type}/simulated_reads", mode: 'copy'
 
@@ -222,7 +233,10 @@ process converting_reads_format {
     --output "${fastq_file.simpleName}.tsv"
   """
 }
-// only for testing 
+
+// cuts the TSV to the first params.n_lines_test rows for fast
+// end-to-end testing. Only active when params.use_get_n_lines = true.
+// Disabled in the lisc profile for production runs.
 process get_n_lines_of_tsv {
     publishDir "${params.output_base}/${read_type}/tsv_processed", mode: 'copy'
     
@@ -238,7 +252,9 @@ process get_n_lines_of_tsv {
     echo "Reduced from \$(wc -l < ${tsv_file}) to ${params.n_lines_test} lines"
     """
 }
-//Calculate embeddings
+// Computes DNABERT-S embeddings for all sequences in the TSV.
+// Outputs raw embeddings (_emb.npy), StandardScaler-normalised embeddings
+// (_emb_stand.npy), and true genome labels (_labels.txt).s
 process calculate_embeddings {
   publishDir "${params.output_base}/${read_type}/embeddings", mode: 'copy'
 
@@ -260,29 +276,10 @@ process calculate_embeddings {
     --out_dir .
     """
 }
-process checkout_all_outputs {
-    debug true
-    input:
-        path emb_file
-        path stand_file
-        path labels_file
 
-    script:
-    """
-    echo "=== Checking embeddings ==="
-    python3 "${projectDir}/checkout_npy.py" "${emb_file}"
-    
-    echo ""
-    echo "=== Checking standardized embeddings ==="
-    python3 "${projectDir}/checkout_npy.py" "${stand_file}"
-    
-    echo ""
-    echo "=== Checking labels ==="
-    wc -l "${labels_file}"
-    head -n 5 "${labels_file}"
-    """
-}
-//Calculate kmean clusters
+// Runs k-means clustering (5 random seeds) on the raw embedding matrix.
+// Saves the best result (highest ARI) as a CSV and writes a metrics
+// summary (ARI, NMI, Purity, Completeness) to a .txt file.
 process kmeans_clustering {
   publishDir "${params.output_base}/${read_type}/clustering", mode: 'copy'
 
@@ -301,6 +298,10 @@ process kmeans_clustering {
     --output_file "${embedding_npy.simpleName}_kmeans_results.csv"
     """
 }
+
+// Generates a t-SNE scatter plot of the standardised embeddings with three
+// panels: true genome labels, k-means predicted clusters, and correct vs.
+// incorrect classification per read.
 process visualization_embeddings{
     publishDir "${params.output_base}/${read_type}/visualizations",mode:'copy' 
     input:
@@ -317,6 +318,10 @@ process visualization_embeddings{
             --output_file "${embeddings_stand_npy.simpleName}.png"
     """
 }
+
+// Computes per-read Euclidean distances to the cluster centroid (within-cluster)
+// and pairwise distances between all cluster centroids (between-cluster).
+// Results are saved as a .npz archive.
 process cluster_distance_calculations{
     publishDir "${params.output_base}/${read_type}/clustering",mode:'copy' 
     input:
@@ -332,6 +337,10 @@ process cluster_distance_calculations{
             --outfile "${embeddings_npy.simpleName}_${read_type}_cluster_distances.npz"
     """
 }
+
+// Produces a combined comparison figure for short and long reads:
+// violin plots of within-cluster distances per species and normalised
+// heatmaps of inter-cluster distances for both read types side by side.
 process cluster_distance_visualization{
     publishDir "${params.output_base}/comparison",mode:'copy' 
     input:
@@ -348,6 +357,11 @@ process cluster_distance_visualization{
             --result_png "cluster_comparison.png"
     """
 }
+
+// Shared subworkflow executed in parallel for both short and long reads.
+// Takes a tuple (read_type, fastq) and runs: TSV conversion → optional
+// truncation → embedding → clustering → visualisation → distance calculation.
+// Emits the distance .npz channel for use in cluster_distance_visualization.
 workflow process_read_pipeline {
     take: //declares the inputs of a named workflow
         fastq_tuple // tuple (read_type, fastqfile)
@@ -358,8 +372,7 @@ workflow process_read_pipeline {
     tsv_for_embddings = tsv_ch
     //TSV shorter (for testing)
     if( params.use_get_n_lines ) {
-        tsv_for_embddings = get_n_lines_of_tsv(tsv_ch)
-    }
+        tsv_for_embddings = get_n_lines_of_tsv(tsv_ch)}
 
     //Calculate embeddings
     emb_outputs = calculate_embeddings(tsv_for_embddings)
@@ -387,14 +400,18 @@ workflow process_read_pipeline {
         distances = dist_out
 
 }
+
+// Main workflow: downloads and processes genomes, simulates short and long
+// reads in parallel, runs process_read_pipeline on both, and finally
+// generates the combined distance comparison figure
 workflow{
     println "current directory ${projectDir}"
     println "Output dir:  ${params.output_base}"
     println "DNABERT-S dir:     ${params.test_model_dir}"
-    data_dir = "${projectDir.parent}/data"
 
     input_ch = channel.fromPath(params.input_txt)
 
+    // Download and process reference genomes
     fasta_files = download_fasta(input_ch)
     processed_fastas = process_fasta(fasta_files.collect(), input_ch)
     // Calculate coverage
@@ -403,10 +420,12 @@ workflow{
     short_ch = short_reads(processed_fastas[1], input_ch, coverage_file_SHORT)
     long_ch  = long_reads(processed_fastas[1], input_ch)
 
+    // Mix both channels and run the shared subworkflow in parallel
     reads_ch = short_ch.mix(long_ch)
     distances_ch = process_read_pipeline(reads_ch).distances
     // distances_ch: tuple(read_type, npz)
 
+    // Separate short and long distance results for final comparison plot
     short_npz = distances_ch.filter{ it[0] == 'short_reads' }.map{ it[1] }.first()
     long_npz  = distances_ch.filter{ it[0] == 'long_reads'  }.map{ it[1] }.first()
     cluster_distance_visualization(short_npz,long_npz)
