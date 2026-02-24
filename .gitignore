@@ -157,6 +157,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.vscode/
 
 # FASTQ, tmp, vcf
 *.fastq
