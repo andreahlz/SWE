@@ -64,8 +64,8 @@ The pipeline is implemented as a Nextflow workflow. Read simulation is performed
 
 ### 3.1 Software
 - Nextflow ≥ 23
-- Python ≥ 3.9
-- Conda with environment: readsdnaberts
+- Python = 3.9
+- Conda with environment: env
 
 ### 3.2 Python Dependencies
 - biopython (Bio.SeqIO)
@@ -79,7 +79,6 @@ The pipeline is implemented as a Nextflow workflow. Read simulation is performed
 git clone https://github.com/andreahlz/SWE.git
 cd SWE
 ```
-
 ### 4.2 Create conda environment
 ```shell
 # Create environment from the yml file
@@ -87,6 +86,21 @@ conda env create -f environment.yml
 # Activate the environment
 conda activate envirpnment
 ```
+
+### 4.3 Download model
+The pre-trained model is hosted on Hugging Face under zhihan1996/DNABERT-S.
+
+To download the model from the command line:
+```shell
+gdown 1ejNOMXdycorDzphLT6jnfGIPUxi6fO0g 
+unzip DNABERT-S.zip  # unzip the data 
+```
+
+Lines xx,xx and xx from flash_attention.py are not compatible with triton. Make them compatible
+```shell
+todo
+```
+
 ## 5.	Input data
 The pipeline requires a single **tab-separated** input file containing NCBI accession IDs and relative abundances. The file path is set via the `input_txt` parameter (see [Section 7](#7-parameters)).
 
