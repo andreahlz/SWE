@@ -146,6 +146,7 @@ Nextflow caches completed process outputs. Use `-resume` to skip steps that have
 nextflow run final_pipeline.nf -profile test -resume
 ```
 ### 6.2 	 HPC Execution (LiSC)
+#### 6.2.1    Starting a LiSC Run 
 The make_slurm_job.sh script generates a SLURM batch job that executes the full Nextflow pipeline. Run from the scripts/ directory:
 ```shell
 bash scripts/make_slurm_job.sh
@@ -160,6 +161,14 @@ The following variables at the top of `make_slurm_job.sh` control the SLURM job 
 | `cpus` | `4` | CPUs for the Nextflow head process |
 | `memory` | `8GB` | Memory for the Nextflow head process |
 | `time` | `2-00:00:00` | Maximum wall-clock time for the whole job (2 days) |
+#### 6.2.2    Monitoring & Debugging
+The .out and .err file from the current run is saved in logs. The work directories of all runs are saved to nextflow_work. Use nextflow log <run-name> -f workdir to find relevant work directories, or nextflow log <run-name> -f "status,workdir" | grep FAILED to find work directories of all failed runs. All recent run names can be listed with nextflow log. Alternatively, the run name can be found in the .out file (eg Launching `/SWE/scripts/final_pipeline.nf` [ecstatic_waddington].
+```shell
+nextflow log
+nextflow log <run-name> -f workdir
+nextflow log <run-name> -f "status,workdir" | grep FAILED
+```
+
 ### 6.5     Overriding default parameters
 All parameters are defined in nextflow.config inside the params { } block and can be overridden at runtime via the command line. The --double-dash syntax overrides any params.* value. 
 ```shell
@@ -170,16 +179,22 @@ nextflow run parallized_pipeline.nf --dataset_name "my_run"
 nextflow run parallized_pipeline.nf \
   --dataset_name "my_run" \
   --target_coverage 20 \
-  --model_short "HiSeq"
+  --model_short "HiSeq"\
+  --cuda_module "CUDA/12.4.0"
 ```
 
-If you work on another cluster as LiSC, make sure which CUDA modules are available and load the module matching triton xxx. (todo)
-The CUDA module is defined inside the LiSC profile block from/in?? (todo) nextflow.config.
-List available CUDA modules (LiSC, for your cluster the command might be different).
+### 6.6    Usage at other HPC Clusters
+Triton 3.4.0 requires CUDA 12.x - please load a corresponding CUDA 12 module from your available modules (e.g. module load cuda/12.x).
+The CUDA module is defined inside the LiSC profile block in the nextflow.config.
 ```shell
+#List available CUDA modules (LiSC, for your cluster the command might be different)
 module avail CUDA
 ```
-#todo
+The respective CUDA module can be chosen by declaring it as a parameter (see 6.5) or by changing line 106 in the nextflow.config. Replace x by the fitting module version.
+```shell
+sed -i 's|CUDA/12.9.1|CUDA/12.x|g' scripts/nextflow.config
+```
+
 ##   7. Parameters
 All parameters are defined in `nextflow.config` inside the `params { }` block.
 
