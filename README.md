@@ -96,9 +96,19 @@ gdown 1ejNOMXdycorDzphLT6jnfGIPUxi6fO0g
 unzip DNABERT-S.zip  # unzip the data 
 ```
 
-Lines xx,xx and xx from flash_attention.py are not compatible with triton. Make them compatible
+Lines 191,434 and 501 from flash_attn_triton.py are not compatible with the triton version. Make them compatible by changing the error-arising lines.
+Conflicting versions:
+191: qk += tl.dot(q, k, trans_b=True)
+434: qk = tl.dot(q, k, trans_b=True)
+501: dp = tl.dot(do, v, trans_b=True)
+Fixed versions:
+191: qk += tl.dot(q, tl.trans(k))
+434: qk = tl.dot(q, tl.trans(k))
+501: dp = tl.dot(do, tl.trans(v))
+To do so run:
 ```shell
-todo
+sed -i 's/(q, k, trans_b=True)/(q, tl.trans(k))/g' flash_attn_triton.py
+sed -i 's/(do, v, trans_b=True)/(do, tl.trans(v))/g' flash_attn_triton.py'
 ```
 
 ## 5.	Input data
@@ -162,6 +172,14 @@ nextflow run parallized_pipeline.nf \
   --target_coverage 20 \
   --model_short "HiSeq"
 ```
+
+If you work on another cluster as LiSC, make sure which CUDA modules are available and load the module matching triton xxx. (todo)
+The CUDA module is defined inside the LiSC profile block from/in?? (todo) nextflow.config.
+List available CUDA modules (LiSC, for your cluster the command might be different).
+```shell
+module avail CUDA
+```
+#todo
 ##   7. Parameters
 All parameters are defined in `nextflow.config` inside the `params { }` block.
 
