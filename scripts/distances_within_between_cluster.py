@@ -1,24 +1,37 @@
+"""
+Calculates within- and between-cluster distances using Euclidean distance. 
+Within-cluster distances are defined as the distance from each data point to its cluster centroid; 
+between-cluster distances as centroid-to-centroid distances. 
+Species labels are taken from the ground-truth clustering to ensure the same data points are used for both short and long read distance calculations. 
+Results are saved to the .npz file specified by --outfile.
+"""
 import pandas as pd
 import argparse
 import numpy as np
 from scipy.spatial.distance import cdist
 
 def main(args):
+    #get labels
     label_file = open(args.label_file,'r')
     labels = [i.rstrip("\n") for i in label_file.readlines()][1:]
     distances = []
+    #save embedding and labels do dataframe
     embedding = np.load(args.embedding_file) 
     data=pd.DataFrame(embedding,index=labels)
     labels_set = set(labels) 
     #calculate centroids
     centroids = {lab:data.loc[[lab]].mean() for lab in labels_set}
+    #initiate distance array, fill it with NaNs
     distances = np.empty(len(data))
     distances[:] = np.nan
     for lab,cent in centroids.items():
+        #create mask, use mask to get data points
         pos = data.index == lab
         data_subset = data.loc[lab]
+        #If there is more than one embedding for the current species
         if type(data_subset) == pd.DataFrame:
             distances[pos] = [np.linalg.norm(data_subset.values[i]-cent,axis=0) for i in range(len(data_subset))]
+        #If the current species only contains one embedding
         else:
             distances[pos] = np.linalg.norm(data_subset-cent,axis = 0)
     #calculate between cluster distance using scipy (returns distance matrix)

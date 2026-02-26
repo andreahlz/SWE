@@ -16,7 +16,7 @@ import csv
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-from utils_parallelized import get_embedding
+from utils import get_embedding
 
 
 def main():

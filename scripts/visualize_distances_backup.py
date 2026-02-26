@@ -1,10 +1,15 @@
+"""
+Visualize distances from short and long read npz files created by 'distances_within_between.py'
+Distances are visualized by violin plots (within cluster distances) and heatmaps (between cluster distances)
+"""
+
 import matplotlib.pyplot as plt
 import argparse
 import numpy as np
 import pandas as pd
-import matplotlib.axes as x
 import matplotlib.gridspec as gridspec
 
+#calculate number of rows and column for good looking layout
 def nr_rows_cols(nr_plots):
     n_cols = int(np.ceil(np.sqrt(nr_plots)))
     rows_violin = int(np.ceil(nr_plots/n_cols))
@@ -14,7 +19,8 @@ def nr_rows_cols(nr_plots):
         n_rows = rows_violin + 2
     return n_rows,rows_violin,n_cols
 
-def try_gs_vis(file1,file2,dataframe_list,rows,rows_violin,cols,save_distance_visualization):
+#visualize distances
+def visualization(file1,file2,dataframe_list,rows,rows_violin,cols,save_distance_visualization):
     gs_vio = gridspec.GridSpec(rows_violin,cols,left=0.05,right=0.95,top=0.95,bottom=0.4,wspace=0.4,hspace=0.2)
     labels=list(set(file2['true_label']))
     cur_row=0
@@ -79,7 +85,7 @@ def main(args):
     dist2 = pd.DataFrame(file2['distances'],index=file2['true_label'],columns=['dist_to_centr'])
     nr_plots = len(set(file2['true_label']))
     rows,rows_violin,cols = nr_rows_cols(nr_plots)
-    try_gs_vis(file1,file2,[dist1,dist2],rows,rows_violin,cols,args.result_png)
+    visualization(file1,file2,[dist1,dist2],rows,rows_violin,cols,args.result_png)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Calculate distances within and between clusters')

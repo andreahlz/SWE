@@ -1,3 +1,11 @@
+""""
+Adapted from utils.py in the DNABERT-S GitHub repository. 
+Provides functions for calculating embeddings from a given TSV file using a specified model. 
+The core get_embedding function is imported by calculate_embedding_for_tsv.py. 
+While only tested with DNABERT-S (model: test), the script should also support tnf, tnf_k, dna2vec, hyenadna, dnabert2, and nt. 
+The model path is specified via test_model_dir.
+"""
+
 import numpy as np
 import transformers
 import torch
@@ -8,6 +16,7 @@ import os
 
 from scipy.optimize import linear_sum_assignment
 
+# Resolves output paths and batch size for the given model, then calls the embedding calculation function.
 def get_embedding(dna_sequences, 
                   model,
                   tsv_file, 
@@ -15,6 +24,7 @@ def get_embedding(dna_sequences,
                   post_fix="",
                   test_model_dir="./test_model",
                   path_data_dir="./data"):
+    # name of resulting embedding file
     model2filename = {
         "tnf": "tnf.npy",
         "tnf_k": "tnf_k.npy",
@@ -24,7 +34,6 @@ def get_embedding(dna_sequences,
         "nt": "nt.npy",
         "test": "test.npy",
     }
-    
     model2batch_size = {
         "tnf": 100,
         "tnf_k": 100,
@@ -48,7 +57,12 @@ def get_embedding(dna_sequences,
     else:
         print(f"Calculate embedding for {model} {tsv_file}")
         
-        if model == "tnf":
+        if model == "test": #DNABERT_S
+            embedding = calculate_llm_embedding(dna_sequences, 
+                                                model_name_or_path=test_model_dir, 
+                                                model_max_length=5000,
+                                                batch_size=batch_size,)
+        elif model == "tnf":
             embedding = calculate_tnf(dna_sequences)
         elif model == "tnf_k":
             embedding = calculate_tnf(dna_sequences, kernel=True)
@@ -70,11 +84,6 @@ def get_embedding(dna_sequences,
                                                 model_name_or_path="InstaDeepAI/nucleotide-transformer-v2-100m-multi-species", 
                                                 model_max_length=2048,
                                                 batch_size=batch_size,)
-        elif model == "test":
-            embedding = calculate_llm_embedding(dna_sequences, 
-                                                model_name_or_path=test_model_dir, 
-                                                model_max_length=5000,
-                                                batch_size=batch_size,)
         else:
             raise ValueError(f"Unknown model {model}")
         
@@ -85,7 +94,86 @@ def get_embedding(dna_sequences,
         
     return embedding
 
+def calculate_llm_embedding(dna_sequences, model_name_or_path, model_max_length=400, batch_size=20):
+    """
+    Calculate embeddings for a list of DNA sequences using a transformer-based model.
+    Sequences are sorted by length before batching to minimize padding overhead.
+    Returns embeddings in the original input order.
+    """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+    # reorder the sequences by length
+    lengths = [len(seq) for seq in dna_sequences]
+    idx = np.argsort(lengths)
+    dna_sequences = [dna_sequences[i] for i in idx]
+    
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+            model_name_or_path,
+            cache_dir=None,
+            model_max_length=model_max_length,
+            padding_side="right",
+            use_fast=True,
+            trust_remote_code=True,
+        )
 
+    # if hyenadna or nt is used as model. For DNABERT_S, both are false.
+    is_hyenadna = "hyenadna" in model_name_or_path
+    is_nt = "nucleotide-transformer" in model_name_or_path
+    
+    if is_nt:
+        model = transformers.AutoModelForMaskedLM.from_pretrained(
+            model_name_or_path,
+            trust_remote_code=True,
+        ) 
+    else:
+        model = transformers.AutoModel.from_pretrained(
+                model_name_or_path,
+                trust_remote_code=True,
+            )
+        
+    model.to(device)
+
+    train_loader = util_data.DataLoader(dna_sequences, batch_size=batch_size, shuffle=False, num_workers=2)
+    
+    for j, batch in enumerate(tqdm.tqdm(train_loader)):
+        with torch.no_grad():
+            # tokenize batch, pad to longest sequence, trunctate if needed
+            token_feat = tokenizer.batch_encode_plus(
+                    batch, 
+                    max_length=model_max_length, 
+                    return_tensors='pt', 
+                    padding='longest', 
+                    truncation=True
+                )
+            # extract tokenized input IDs from the output, move them to correct device
+            input_ids = token_feat['input_ids'].to(device)
+            # extract attention mask from tokenizer output and move it to device
+            attention_mask = token_feat['attention_mask'].to(device)
+            if is_hyenadna:
+                model_output = model.forward(input_ids=input_ids)[0].detach().cpu()
+            else:
+                model_output = model.forward(input_ids=input_ids, attention_mask=attention_mask)[0].detach().cpu()
+            
+            # mean pooling over token dimension, weighted by attention mask
+            # to ignore padding tokens in the average
+            attention_mask = attention_mask.unsqueeze(-1).detach().cpu()
+            embedding = torch.sum(model_output*attention_mask, dim=1) / torch.sum(attention_mask, dim=1)
+            
+            # accumulate embeddings across batches
+            if j==0:
+                embeddings = embedding
+            else:
+                
+                embeddings = torch.cat((embeddings, embedding), dim=0)
+
+    embeddings = np.array(embeddings.detach().cpu())
+    
+    # reorder the embeddings
+    embeddings = embeddings[np.argsort(idx)]
+
+    return embeddings
+
+# Untested helper functions for alternative models, included for potential future use.
 def calculate_tnf(dna_sequences, kernel=False):
     # Define all possible tetra-nucleotides
     nucleotides = ['A', 'T', 'C', 'G']
@@ -142,81 +230,6 @@ def calculate_dna2vec_embedding(dna_sequences, embedding_dir):
     embedding = np.dot(tnf_embedding, kmer_embedding)    
     
     return embedding
-
-
-
-
-def calculate_llm_embedding(dna_sequences, model_name_or_path, model_max_length=400, batch_size=20):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-    # reorder the sequences by length
-    lengths = [len(seq) for seq in dna_sequences]
-    idx = np.argsort(lengths)
-    dna_sequences = [dna_sequences[i] for i in idx]
-    
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model_name_or_path,
-            cache_dir=None,
-            model_max_length=model_max_length,
-            padding_side="right",
-            use_fast=True,
-            trust_remote_code=True,
-        )
-
-    is_hyenadna = "hyenadna" in model_name_or_path
-    is_nt = "nucleotide-transformer" in model_name_or_path
-    
-    if is_nt:
-        model = transformers.AutoModelForMaskedLM.from_pretrained(
-            model_name_or_path,
-            trust_remote_code=True,
-        ) 
-    else:
-        model = transformers.AutoModel.from_pretrained(
-                model_name_or_path,
-                trust_remote_code=True,
-            )
-    
-
-    """ n_gpu = torch.cuda.device_count()
-    if n_gpu > 1:
-        model = nn.DataParallel(model) """
-        
-    model.to(device)
-
-
-    train_loader = util_data.DataLoader(dna_sequences, batch_size=batch_size, shuffle=False, num_workers=2)
-    for j, batch in enumerate(tqdm.tqdm(train_loader)):
-        with torch.no_grad():
-            token_feat = tokenizer.batch_encode_plus(
-                    batch, 
-                    max_length=model_max_length, 
-                    return_tensors='pt', 
-                    padding='longest', 
-                    truncation=True
-                )
-            input_ids = token_feat['input_ids'].to(device)
-            attention_mask = token_feat['attention_mask'].to(device)
-            if is_hyenadna:
-                model_output = model.forward(input_ids=input_ids)[0].detach().cpu()
-            else:
-                model_output = model.forward(input_ids=input_ids, attention_mask=attention_mask)[0].detach().cpu()
-                
-            attention_mask = attention_mask.unsqueeze(-1).detach().cpu()
-            embedding = torch.sum(model_output*attention_mask, dim=1) / torch.sum(attention_mask, dim=1)
-            
-            if j==0:
-                embeddings = embedding
-            else:
-                
-                embeddings = torch.cat((embeddings, embedding), dim=0)
-
-    embeddings = np.array(embeddings.detach().cpu())
-    
-    # reorder the embeddings
-    embeddings = embeddings[np.argsort(idx)]
-
-    return embeddings
 
 def KMedoid(features,
             min_similarity=0.8,

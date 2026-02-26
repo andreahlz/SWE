@@ -18,6 +18,7 @@ dependencies:
   - tqdm
   - python-dotenv
   - einops
+  - gdown
   - pip:
       - torch
       - transformers==4.27
