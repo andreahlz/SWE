@@ -1,14 +1,29 @@
 #!/usr/bin/env python3
 """
-This script calculates the coverage for short reads by using 
-abundance from input.txt
+Calculates the number of short reads required per genome to reach
+params.target_coverage given the genome size and params.short_read_length.
+Writes the total read count to coverage_short.txt.
 
 coverage = (target_coverage * effektive_size)/short_read_length
 effektive_size = len(sequence) * abundance
 
-Usage: python genome_coverage_calculator.py
+Usage: 
+    python genome_coverage_calculator.py \
+        --input_file            data/input/input.tx \
+        --newheader_fastas_dir  processed \
+        --target_coverage       10 \
+        --short_read_length     300 \
+        --txt_short_output      coverage_short.txt 
+
+Arguments:
+    --input_file            Tab-separated file with accession IDs and abundances (see Section 5)
+    --newheader_fastas_dir  Directory containing the re-headered .fna files
+    --target_coverage       How often each base is sequences on average
+    --short_read_length     Length of short reads in bp 
+    --txt_short_output      coverage_short.txt 
 
 Requirements: pip install python-dotenv
+
 """
 
 #from dotenv import dotenv_values

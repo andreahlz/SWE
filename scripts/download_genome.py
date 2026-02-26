@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 """
-This script downloads genomes from NCBI by accession number
-and reads accession IDs from input.txt
+This script downloads genome FASTA files from NCBI by using accession numbers listed in input_txt
 
-Usage: python genome_download.py
+Input: input_txt file
+Output: one .fna file per genome
+
+Usage: 
+    python genome_download.py\
+        --input_file        data/input/input.txt\
+        --output_dir        data/genomes/fasta_files\
+        --timeout           300
+
+Arguments:
+    --input_file        Tab-separated file with accession IDs and abundances 
+    --output_dir        Output directory for raw per-accession .fna files
+    --timeout 300       The request for NCBI API will wait for 300s before giving up
 
 Requirements: pip install requests python-dotenv
 """
