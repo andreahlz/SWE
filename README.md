@@ -247,13 +247,13 @@ These parameters point to the Python scripts called by each process. All default
 |---|---|
 | `py_coverage_calc` | `genome_coverage_calculator.py` |
 | `py_fastq_to_tsv` | `fastq_to_tsv.py` |
-| `py_embedding_calc` | `calculate_embedding_for_tsv_02.py` |
+| `py_embedding_calc` | `calculate_embedding_for_tsv.py` |
 | `py_kmeans` | `cluster_embeddings.py` |
 | `py_visualization` | `visualize_embeddings.py` |
 | `py_download` | `download_genome.py` |
 | `py_process_fna` | `process_genomes.py` |
 | `py_cluster_dist` | `distances_within_between_cluster.py` |
-| `py_visualization_cluster_dist` | `compare_distances.py` |
+| `py_visualization_cluster_dist` | `visualize_distances.py` |
 
 ## 8. Output
 ### 8.1     Output structure
