@@ -53,11 +53,11 @@ The pipeline is implemented as a Nextflow workflow. Read simulation is performed
 | `long_reads` | Badread | Simulate Nanopore long reads with badread with the correct target coverage |
 | `converting_reads_format` | `fastq_to_tsv.py` | Convert FASTQ to two-column TSV: sequence + genome label |
 | `get_n_lines_of_tsv` | bash `head` | Truncate TSV to first N lines for fast testing (only when `use_get_n_lines = true`) |
-| `calculate_embeddings` | `calculate_embedding_for_tsv_02.py` | Compute DNABERT-S embeddings; output raw `.npy`, standardised `.npy`, and labels |
+| `calculate_embeddings` | `calculate_embedding_for_tsv.py` | Compute DNABERT-S embeddings; output raw `.npy`, standardised `.npy`, and labels |
 | `kmeans_clustering` | `cluster_embeddings.py` | k-means clustering (5 seeds); report ARI, NMI, Purity, Completeness |
 | `visualization_embeddings` | `visualize_embeddings.py` | t-SNE scatter plot: true labels, predicted clusters |
 | `cluster_distance_calculations` | `distances_within_between_cluster.py` | Compute within-cluster and between-cluster distances  |
-| `cluster_distance_visualization` | `compare_distances.py` | Violin + heatmap plot comparing short vs. long read distances |
+| `cluster_distance_visualization` | `visualize_distances.py` | Violin + heatmap plot for short vs. long read distances |
 
 
 ## 3. Requirements
