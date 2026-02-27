@@ -193,7 +193,7 @@ The CUDA module is defined as a parameter in nextflow.config.
 #List available CUDA modules (LiSC, for your cluster the command might be different)
 module avail CUDA
 ```
-The respective CUDA module can be chosen by declaring it as a parameter (see 6.5) or by changing line 106 in the nextflow.config. Replace x by the fitting module version which is available on your HPC.
+The respective CUDA module can be chosen by declaring it as a parameter (see 6.5) or by changing line 51 in the nextflow.config. Replace x by the fitting module version which is available on your HPC.
 ```shell
 sed -i 's|CUDA/12.9.1|CUDA/12.x|g' scripts/nextflow.config
 ```
