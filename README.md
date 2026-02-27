@@ -72,6 +72,7 @@ The pipeline is implemented as a Nextflow workflow. Read simulation is performed
 - numpy, pandas, scikit-learn, matplotlib
 - requests (for NCBI genome download)
 -	torch, transformers==4.27
+-	optional: triton
 
 ## 4.	Installation
 ### 4.1 Clone Repository
@@ -96,19 +97,18 @@ gdown 1ejNOMXdycorDzphLT6jnfGIPUxi6fO0g
 unzip DNABERT-S.zip  # unzip the data 
 ```
 
-Lines 191,434 and 501 from flash_attn_triton.py are not compatible with the triton version. Make them compatible by changing the error-arising lines.
-Conflicting versions:
-191: qk += tl.dot(q, k, trans_b=True)
-434: qk = tl.dot(q, k, trans_b=True)
-501: dp = tl.dot(do, v, trans_b=True)
-Fixed versions:
-191: qk += tl.dot(q, tl.trans(k))
-434: qk = tl.dot(q, tl.trans(k))
-501: dp = tl.dot(do, tl.trans(v))
+Certain lines in flash_attn_triton.py are incompatible with the installed Triton version, and one line in bert_layers.py causes issues when running the pipeline on CPU with Triton installed. Apply the necessary changes to resolve these incompatibilities.
+|file|line|conflicting version|fixed version|
+|flash_attn_triton.py|191| qk += tl.dot(q, k, trans_b=True)|qk += tl.dot(q, tl.trans(k))|
+|flash_attn_triton.py|434| qk = tl.dot(q, k, trans_b=True)|qk = tl.dot(q, tl.trans(k))|
+|flash_attn_triton.py|501| dp = tl.dot(do, v, trans_b=True)|dp = tl.dot(do, tl.trans(v))|
+|bert_layers.py|160|if self.p_dropout or flash_attn_qkvpacked_func is None|if self.p_dropout or flash_attn_qkvpacked_func is None or not torch.cuda.is_available()|
+
 To do so run:
 ```shell
-sed -i 's/(q, k, trans_b=True)/(q, tl.trans(k))/g' flash_attn_triton.py
-sed -i 's/(do, v, trans_b=True)/(do, tl.trans(v))/g' flash_attn_triton.py'
+sed -i 's/(q, k, trans_b=True)/(q, tl.trans(k))/g' DNABERT_S/flash_attn_triton.py
+sed -i 's/(do, v, trans_b=True)/(do, tl.trans(v))/g' DNABERT_S/flash_attn_triton.py
+sei -i 's/flash_attn_qkvpacked_func is None/flash_attn_qkvpacked_func is None or not torch.cuda.is_available()|/g' DNABERT_S/bert_layers.py
 ```
 
 ## 5.	Input data
