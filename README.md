@@ -85,7 +85,7 @@ cd SWE
 # Create environment from the yml file
 conda env create -f environment.yml
 # Activate the environment
-conda activate envirpnment
+conda activate environment
 ```
 
 ### 4.3 Download model
