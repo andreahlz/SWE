@@ -28,7 +28,8 @@ def load_clustering_results(clustering_csv_file):
 
 # apply t-SNE to the embeddings to reduce their dimensionality to 2D
 def dimreduct_TSNE(X=np.array):
-    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=int((len(X)/100))).fit_transform(X)
+    perp = int((len(X)/100)) if int((len(X)/100)) <= 700 else 700
+    X_embedded = TSNE(n_components=2,learning_rate='auto',perplexity=perp).fit_transform(X)
     return X_embedded
 
 def create_visualization(embeddings_2d,true_labels,predicted_labels, output_file):
@@ -85,18 +86,18 @@ def main(args):
     create_visualization(embeddings_2d, true_labels, predicted_labels, args.output_file)
 
 if __name__ == "__main__":
-    args = argparse.Namespace(
-        embedding_file = '/home/barbara/SWE/data_test/short_reads/embeddings/test_run_processed_emb_stand.npy',
-        label_file = '/home/barbara/SWE/data_test/short_reads/embeddings/test_run_processed_labels.txt',
-        clustering_file = '/home/barbara/SWE/data_test/short_reads/clustering/test_run_processed_emb_kmeans_results.csv',
-        output_file = '/home/barbara/SWE/perplexity_dyn.png'
+   # args = argparse.Namespace(
+        #embedding_file = '/home/barbara/SWE/data_test/short_reads/embeddings/test_run_processed_emb_stand.npy',
+       # label_file = '/home/barbara/SWE/data_test/short_reads/embeddings/test_run_processed_labels.txt',
+      #  clustering_file = '/home/barbara/SWE/data_test/short_reads/clustering/test_run_processed_emb_kmeans_results.csv',
+     #   output_file = '/home/barbara/SWE/perplexity_dyn.png'
 
-    )
-    # parser = argparse.ArgumentParser(description='Visualize embeddings with t-sne')
-    # parser.add_argument('--embedding_file',type=str, required=True,help='Path to combined_embeddings_stand.npy(standardized)')
-    # parser.add_argument('--label_file',type=str, required=True,help='Path to combined_labels_stand.txt')
-    # parser.add_argument('--clustering_file',type=str, required=True,help='Path to kmeans_results.csv')
-    # parser.add_argument('--output_file',type=str, required=True,help='Path to save visualization PNG')
-    # args = parser.parse_args()
+    #)
+    parser = argparse.ArgumentParser(description='Visualize embeddings with t-sne')
+    parser.add_argument('--embedding_file',type=str, required=True,help='Path to combined_embeddings_stand.npy(standardized)')
+    parser.add_argument('--label_file',type=str, required=True,help='Path to combined_labels_stand.txt')
+    parser.add_argument('--clustering_file',type=str, required=True,help='Path to kmeans_results.csv')
+    parser.add_argument('--output_file',type=str, required=True,help='Path to save visualization PNG')
+    args = parser.parse_args()
     main(args)
     

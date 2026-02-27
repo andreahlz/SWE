@@ -1,0 +1,24 @@
+name: env_new_py
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - nextflow
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - biopython
+  - insilicoseq
+  - badread
+  - tqdm
+  - python-dotenv
+  - einops
+  - gdown
+  - pip:
+      - torch
+      - transformers==4.27
