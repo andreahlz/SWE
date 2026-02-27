@@ -21,9 +21,6 @@ Arguments:
     --target_coverage       How often each base is sequences on average
     --short_read_length     Length of short reads in bp 
     --txt_short_output      coverage_short.txt 
-
-Requirements: pip install python-dotenv
-
 """
 
 #from dotenv import dotenv_values

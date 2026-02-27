@@ -15,8 +15,6 @@ Arguments:
     --input_file        Tab-separated file with accession IDs and abundances 
     --output_dir        Output directory for raw per-accession .fna files
     --timeout 300       The request for NCBI API will wait for 300s before giving up
-
-Requirements: pip install requests python-dotenv
 """
 
 import sys
