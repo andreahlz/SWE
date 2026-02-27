@@ -163,6 +163,7 @@ The following variables at the top of `make_slurm_job.sh` control the SLURM job 
 | `cpus` | `4` | CPUs for the Nextflow head process |
 | `memory` | `8GB` | Memory for the Nextflow head process |
 | `time` | `2-00:00:00` | Maximum wall-clock time for the whole job (2 days) |
+
 #### 6.2.2    Monitoring & Debugging
 The .out and .err file from the current run is saved in logs. The work directories of all runs are saved to nextflow_work. Use nextflow log <run-name> -f workdir to find relevant work directories, or nextflow log <run-name> -f "status,workdir" | grep FAILED to find work directories of all failed runs. All recent run names can be listed with nextflow log. Alternatively, the run name can be found in the .out file (eg Launching `/SWE/scripts/final_pipeline.nf` [ecstatic_waddington].
 ```shell
@@ -187,12 +188,12 @@ nextflow run parallized_pipeline.nf \
 
 ### 6.6    Usage at other HPC Clusters
 Triton 3.4.0 requires CUDA 12.x - please load a corresponding CUDA 12 module from your available modules (e.g. module load cuda/12.x).
-The CUDA module is defined inside the LiSC profile block in the nextflow.config.
+The CUDA module is defined as a parameter in nextflow.config.
 ```shell
 #List available CUDA modules (LiSC, for your cluster the command might be different)
 module avail CUDA
 ```
-The respective CUDA module can be chosen by declaring it as a parameter (see 6.5) or by changing line 106 in the nextflow.config. Replace x by the fitting module version.
+The respective CUDA module can be chosen by declaring it as a parameter (see 6.5) or by changing line 106 in the nextflow.config. Replace x by the fitting module version which is available on your HPC.
 ```shell
 sed -i 's|CUDA/12.9.1|CUDA/12.x|g' scripts/nextflow.config
 ```
