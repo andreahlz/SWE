@@ -124,11 +124,13 @@ def calculate_llm_embedding(dna_sequences, model_name_or_path, model_max_length=
         model = transformers.AutoModelForMaskedLM.from_pretrained(
             model_name_or_path,
             trust_remote_code=True,
+            torch_dtype=torch.float16,
         ) 
     else:
         model = transformers.AutoModel.from_pretrained(
                 model_name_or_path,
                 trust_remote_code=True,
+                torch_dtype=torch.float16,
             )
         
     model.to(device)
