@@ -94,11 +94,13 @@ The pre-trained model is hosted on Hugging Face under zhihan1996/DNABERT-S.
 To download the model from the command line:
 ```shell
 gdown 1ejNOMXdycorDzphLT6jnfGIPUxi6fO0g 
-unzip DNABERT-S.zip  # unzip the data 
+unzip DNABERT-S.zip  # unzip the data
+rm -rf DNABERT-S.zip # remove zipped data (optional)
 ```
 
 Certain lines in flash_attn_triton.py are incompatible with the installed Triton version, and one line in bert_layers.py causes issues when running the pipeline on CPU with Triton installed. Apply the necessary changes to resolve these incompatibilities.
 |file|line|conflicting version|fixed version|
+|---|---|---|---|
 |flash_attn_triton.py|191| qk += tl.dot(q, k, trans_b=True)|qk += tl.dot(q, tl.trans(k))|
 |flash_attn_triton.py|434| qk = tl.dot(q, k, trans_b=True)|qk = tl.dot(q, tl.trans(k))|
 |flash_attn_triton.py|501| dp = tl.dot(do, v, trans_b=True)|dp = tl.dot(do, tl.trans(v))|
