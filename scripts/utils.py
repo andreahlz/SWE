@@ -13,6 +13,8 @@ import torch.utils.data as util_data
 import torch.nn as nn
 import tqdm
 import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 from scipy.optimize import linear_sum_assignment
 
