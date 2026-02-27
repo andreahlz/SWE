@@ -32,7 +32,6 @@ def prepare_labels(labels):
     return labels_numeric, num_clusters, label2id
 
 def perform_kmeans(embeddings, labels, num_clusters, random_seeds=[0, 1, 2, 3, 4]):
-    #random_seeds = [0,1] #for quick testing, delete later
     embedding_norm = normalize(embeddings)
     results = []
     for random_seed in random_seeds:

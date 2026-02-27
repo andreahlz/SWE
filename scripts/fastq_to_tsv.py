@@ -1,3 +1,8 @@
+"""
+Converts fastq file into tsv with the colums: sequence, species. 
+Output file name is given by command line argument.
+Written for fastq files created by InSilicoSeq or Badread.
+"""
 from Bio import SeqIO
 from pathlib import Path
 import sys
@@ -22,14 +27,6 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
             # Extract label based on format
             # Short reads: @GCF_000025985.1_0_0/1
             # Long reads: @uuid GCF_000025985.1,+strand,start-end ..
-            """"
-            parts = record.id.split("_")
-            if len(parts) < 2:
-                raise ValueError(
-                    f"Read ID '{record.id}' does not contain '_' -> cannot extract label with split('_')[1]"
-                )
-            label = parts[1]
-            """
             description = record.description #saves header
             if ' ' in description: #badread reads have whitespaces
                 parts = description.split()
@@ -38,11 +35,11 @@ def fastq_to_clustering_tsv(fastq_file,output_file=None):
                     label= genome_descriptor.split(',')[0]
                 else:
                     raise ValueError(f"Unexpected Badread format: {description}")
-            else:
-                m = iss_re.match(record.id)
+            else: #in fastq produced by InSilicoSeq
+                m = iss_re.match(record.id) #match pattern at the beginning of record.id
                 if m:
-                    label = m.group(1)
-                else:
+                    label = m.group(1) #extract first captured group
+                else: #no match was found
                      raise ValueError(f"Unexpected InSilicoSeq format: id={record.id} desc={description}")
 
             file.write(f"{record.seq}\t{label}\n")
