@@ -242,7 +242,12 @@ All parameters are defined in `nextflow.config` inside the `params { }` block.
 | `use_get_n_lines` | `true` | When `true`, truncates each TSV to `n_lines_test` rows before embedding, enables fast end-to-end testing. Set to `false` in the `lisc` profile for production runs |
 | `n_lines_test` | `10` | Number of reads to keep per TSV when `use_get_n_lines` is `true`. The `test` profile sets this to `2000` |
 
-### 7.6 Python Script Paths
+### 7.6 Lisc specific parameters
+| Parameter | Default | Description |
+|---|---|---|
+| cuda_module| "CUDA/12.9.1" |CUDA module for runs on Lisc nessary|
+
+### 7.7 Python Script Paths
 
 These parameters point to the Python scripts called by each process. All default to `${projectDir}/<filename>` and rarely need to be changed.
 

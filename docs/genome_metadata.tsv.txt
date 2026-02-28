@@ -1,9 +1,0 @@
-Species name	NCBI accession	Genome size	File name	File name	Abundance
-Akkermansia muciniphila	GCF_009731575.1	2.9 Mb	GCF_009731575.1_ASM973157v1_genomic.fna	Akkermansia_muciniphila_genomic.fna	0.08
-Bacteroides fragilis NCTC 9343	GCF_000025985.1	5.2 Mb	GCF_000025985.1_ASM2598v1_genomic.fna	Bacteroides_fragilis_genomic.fna	0.4
-Bifidobacterium longum subsp. longum JCM 1217	GCF_000196555.1	2.4 Mb	GCF_000196555.1_ASM19655v1_genomic.fna	Bifidobacterium_longum_genomic.fna	0.05
-Blautia obeum ATCC 29174	GCF_025147765.1	3.6 Mb	GCF_025147765.1_ASM2514776v1_genomic.fna	Blautia_obeum_genomic.fna	0.15
-Enterococcus faecalis	GCF_029024925.1	2.9 Mb	GCF_029024925.1_ASM2902492v1_genomic.fna	Enterococcus_faecalis_genomic.fna	0.06
-Faecalibacterium prausnitzii	GCF_049532935.1	3.1 Mb	GCF_049532935.1_ASM4953293v1_genomic.fna	Faecalibacterium_prausnitzii_genomic.fna	0.2
-Prevotella intermedia ATCC 25611 = DSM 20706	GCF_001953955.1	2.7 Mb	GCF_000196555.1_ASM19655v1_genomic.fna	Prevotella_intermedia_genomic.fna	0.04
-Roseburia intestinalis L1-82	GCF_900537995.1	4.5 Mb	GCF_900537995.1_Roseburia_intestinalis_strain_L1-82_genomic.fna	Roseburia_intestinalis_genomic.fna	0.02
