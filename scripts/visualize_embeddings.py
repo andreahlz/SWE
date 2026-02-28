@@ -1,8 +1,38 @@
 """
+visualize_embeddings.py
 t-SNE visualization of embeddings with clustering results
 
 Based on: eval_clustering_classification_changed.py 
 Modified for: Nextflow pipeline
+
+Loads standardised embeddings and their true/predicted labels, reduces the
+embedding space to 2D via t-SNE, and saves a two-panel scatter plot comparing
+ground truth species labels against K-means cluster assignments.
+
+Usage
+-----
+    python visualize_embeddings.py \\
+        --embedding_file path/to/<base>_emb_stand.npy \\
+        --label_file     path/to/<base>_labels.txt \\
+        --clustering_file path/to/<base>_kmeans_results.csv \\
+        --output_file    path/to/<base>_visualization.png
+
+Arguments
+---------
+--embedding_file  : Standardised embedding matrix (.npy), shape (N_reads x embedding_dim).
+                    Use _emb_stand.npy from calculate_embedding_for_tsv.py.
+--label_file      : Labels file (.txt) from calculate_embedding_for_tsv.py.
+                    First line must be the header "true_label".
+--clustering_file : K-means results CSV from cluster_embeddings.py.
+                    Must contain columns: true_label, predicted_labels.
+--output_file     : Path to save the output PNG file (dpi=300).
+
+Output
+------
+A two-panel PNG figure:
+    Panel 1 — True Labels (Ground Truth): reads coloured by species.
+    Panel 2 — K-means Clustering: reads coloured by predicted cluster ID.
+Both panels share the same t-SNE 2D projection.
 """
 
 import argparse
@@ -12,6 +42,13 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
 def load_embeddings_from_npy(npy_file,label_file):
+    """
+    Loads standardised embedding matrix and true labels
+    Parameters:
+        npy_file: Path to .npy file containing the embedding matrix
+        label_file: Path to labels .txt file
+    """
+    
     embeddings = np.load(npy_file)
     with open(label_file, 'r') as f:
         lines= f.read().strip().split('\n')
@@ -19,6 +56,14 @@ def load_embeddings_from_npy(npy_file,label_file):
     return embeddings, labels
 
 def load_clustering_results(clustering_csv_file):
+    """
+    Loads true and predicted labels from a K-means results CSV
+    Parameters:
+        clustering_csv_file: Path to CSV produced by cluster_embeddings.py
+    Returns:
+        true_labels :True genome labels per read
+        pred_labels : Predicted cluster IDs per read (best seed from K-means)d
+    """
     # loads k-means clustering reuslts
     df = pd.read_csv(clustering_csv_file)
     true_labels = df['true_label'].values
