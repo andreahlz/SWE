@@ -109,9 +109,9 @@ Certain lines in flash_attn_triton.py are incompatible with the installed Triton
 
 To do so run:
 ```shell
-sed -i 's/(q, k, trans_b=True)/(q, tl.trans(k))/g' DNABERT_S/flash_attn_triton.py
-sed -i 's/(do, v, trans_b=True)/(do, tl.trans(v))/g' DNABERT_S/flash_attn_triton.py
-sei -i 's/flash_attn_qkvpacked_func is None/flash_attn_qkvpacked_func is None or not torch.cuda.is_available()|/g' DNABERT_S/bert_layers.py
+sed -i 's/(q, k, trans_b=True)/(q, tl.trans(k))/g' DNABERT-S/flash_attn_triton.py
+sed -i 's/(do, v, trans_b=True)/(do, tl.trans(v))/g' DNABERT-S/flash_attn_triton.py
+sed -i 's/flash_attn_qkvpacked_func is None/flash_attn_qkvpacked_func is None or not torch.cuda.is_available()|/g' DNABERT_S/bert_layers.py
 ```
 
 ## 5.	Input data
