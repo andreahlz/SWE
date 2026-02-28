@@ -4,6 +4,19 @@ Provides functions for calculating embeddings from a given TSV file using a spec
 The core get_embedding function is imported by calculate_embedding_for_tsv.py. 
 While only tested with DNABERT-S (model: test), the script should also support tnf, tnf_k, dna2vec, hyenadna, dnabert2, and nt. 
 The model path is specified via test_model_dir.
+
+Usage
+-----
+file is not called directly
+function get_embedding is imported to calculate_embedding_for_tsv.py
+
+Arguments of get_embedding:
+-----
+dna_sequences: list of dna sequences
+model: 'test' (for DNABERT_S)
+tsv_file: path to tsv file with columns: dna sequence, species
+test_model_dir: path to trained model
+path_data_dir: path to directory to load / save embedding
 """
 
 import numpy as np
