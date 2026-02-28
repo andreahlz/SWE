@@ -1,2 +1,0 @@
-NZ_CP102265.1Blautia 0.7
-NC_015067.1Bifidobacterium 0.3

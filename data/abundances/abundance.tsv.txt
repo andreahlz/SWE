@@ -1,9 +1,0 @@
-species	abundance
-Akkermansia muciniphila	0.08
-Bacteroides fragilis NCTC 9343	0.4
-Bifidobacterium longum subsp. longum JCM 1217	0.05
-Blautia obeum ATCC 29174	0.15
-Enterococcus faecalis	0.06
-Faecalibacterium prausnitzii	0.2
-Prevotella intermedia ATCC 25611 = DSM 20706	0.04
-Roseburia intestinalis L1-82	0.02
