@@ -1,4 +1,5 @@
-# User documentation
+# User documentation 
+# Species-aware embeddings of short and long read datasets
 
 **Course:** Software Engineering (SWE) - 2025w053531  
 **Institution:** University of Vienna  
@@ -172,7 +173,7 @@ nextflow log <run-name> -f workdir
 nextflow log <run-name> -f "status,workdir" | grep FAILED
 ```
 
-### 6.5     Overriding default parameters
+### 6.3     Overriding default parameters
 All parameters are defined in nextflow.config inside the params { } block and can be overridden at runtime via the command line. The --double-dash syntax overrides any params.* value. 
 ```shell
 # Override one parameter
@@ -186,7 +187,7 @@ nextflow run parallized_pipeline.nf \
   --cuda_module "CUDA/12.4.0"
 ```
 
-### 6.6    Usage at other HPC Clusters
+### 6.4    Usage at other HPC Clusters
 Triton 3.4.0 requires CUDA 12.x - please load a corresponding CUDA 12 module from your available modules (e.g. module load cuda/12.x).
 The CUDA module is defined as a parameter in nextflow.config.
 ```shell
