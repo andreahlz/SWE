@@ -38,7 +38,7 @@ The SLURM job script generates a batch job to execute the full pipeline on an HP
 
 Short-read and long-read branches run in **parallel** through a shared named subworkflow (`process_read_pipeline`). The pipeline is managed by Nextflow and fully configured through `nextflow.config`.
 
-![alt text](image.png)
+![alt text](pipeline_overview.png)
 
 
 ## 2. Pipeline Architecture
@@ -85,7 +85,7 @@ cd SWE
 # Create environment from the yml file
 conda env create -f environment.yml
 # Activate the environment
-conda activate environment
+conda activate env
 ```
 
 ### 4.3 Download model
