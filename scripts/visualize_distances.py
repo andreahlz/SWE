@@ -1,7 +1,29 @@
 """
+visualize_distances.py
 Visualize distances calculated by 'distances_within_between.py'. 
 Requires two .npz files as input (short and long reads) and the truth ground labels.
 Distances are visualized by violin plots (within cluster distances) and heatmaps (between cluster distances)
+
+Usage
+-----
+    python visualize_distances.py \\
+        --file_1     path/to/short_reads_cluster_distances.npz \\
+        --file_2     path/to/long_reads_cluster_distances.npz \\
+        --result_png path/to/cluster_comparison.png
+
+Arguments
+---------
+--file_1: .npz file for short reads from distances_within_between_cluster.py
+--file_2: .npz file for long reads from distances_within_between_cluster.py
+--result_png: Path to save the output PNG figure.
+                Default: calculated_distances.png
+
+Output
+------
+A single PNG figure with two sections:
+    Top    -- Violin plots: within-cluster distances per species,
+              short reads (left violin) vs long reads (right violin).
+    Bottom -- Heatmaps: pairwise between-cluster distances
 """
 
 import matplotlib.pyplot as plt
@@ -12,6 +34,15 @@ import matplotlib.gridspec as gridspec
 
 # calculate number of rows and column for good pleasing grid layout
 def nr_rows_cols(nr_plots):
+    """
+    Computes grid dimensions for the violin plot section based on number of species.
+    Parameters:
+        nr_plots: Number of species (= number of violin subplots needed)
+    returns:
+        n_rows: Total number of rows in the figure grid
+    rows_violin: Number of rows used by the violin plot section.
+    n_cols: Number of columns in the grid (approx. square root of nr_plots)
+    """
     n_cols = int(np.ceil(np.sqrt(nr_plots)))
     rows_violin = int(np.ceil(nr_plots/n_cols))
     if n_cols < 4:
@@ -22,6 +53,22 @@ def nr_rows_cols(nr_plots):
 
 # plot violin plots for within cluser distances
 def violin_plot_section(fig, dataframe_list, labels, rows_violin, n_cols):
+    """
+    AddS violin plots for within-cluster distances to the figure (top section).
+
+    One subplot per species; each subplot shows two violins: short reads (left)
+    and long reads (right).
+    
+    Parameters
+    fig: The figure to draw into.
+    dataframe_list :
+        Two DataFrames [short, long], each indexed by species label with a
+        column 'dist_to_centr' containing per-read distances to centroid.
+    labels: Species labels determining the order of subplots.
+    rows_violin: Number of rows in the violin gridspec (from nr_rows_cols()).
+    n_cols: Number of columns in the violin gridspec (from nr_rows_cols()).
+
+    """
     gs_violin = gridspec.GridSpec(rows_violin,n_cols,left=0.05,right=0.95,
                                   top=0.95,bottom=0.4,wspace=0.4,hspace=0.2)
     # title for violin plot section
@@ -51,6 +98,15 @@ def violin_plot_section(fig, dataframe_list, labels, rows_violin, n_cols):
 
 # plot heatmaps for between cluster distances
 def heatmap_section(fig, dist_ma1, dist_ma2, n_cols, unique_labels):
+    """
+    Add heatmaps for between-cluster distances to the figure (bottom section
+    Parameters:
+        fig: The figure to draw into.
+        dist_ma1: Pairwise centroid distance matrix for short reads.
+        dist_ma2: Pairwise centroid distance matrix for long reads.
+        n_cols: Number of columns from nr_rows_cols(); controls stacked vs side-by-side layout.
+        unique_labels : Species labels for heatmap axis tick lab
+    """
     all_dists = np.array([dist_ma1,dist_ma2]).flatten()
     p99 = np.percentile(all_dists,99)
     # normalize distances by 99th percentile
@@ -84,6 +140,10 @@ def heatmap_section(fig, dist_ma1, dist_ma2, n_cols, unique_labels):
 
 # Raise a descriptive error if expected keys are missing from an npz file.
 def validate_npz(data, path):
+    """
+    Validate that a loaded .npz file contains all required keys
+    Currently commented out in main() but can be enabled for debugging.
+    """
     required_keys = {"distances", "true_label", "between"}
     missing = required_keys - set(data.files)
     if missing:

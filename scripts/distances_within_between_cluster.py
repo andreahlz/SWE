@@ -1,9 +1,26 @@
 """
+distances_within_between_cluster.py
+
 Calculates within- and between-cluster distances using Euclidean distance. 
 Within-cluster distances are defined as the distance from each data point to its cluster centroid; 
 between-cluster distances as centroid-to-centroid distances. 
 Species labels are taken from the ground-truth clustering to ensure the same data points are used for both short and long read distance calculations. 
 Results are saved to the .npz file specified by --outfile.
+
+Usage
+-----
+    python distances_within_between_cluster.py \\
+        --embedding_file path/to/<base>_emb.npy \\
+        --label_file     path/to/<base>_labels.txt \\
+        --outfile        path/to/<base>_cluster_distances.npz
+
+Arguments
+---------
+--embedding_file: Path to raw embedding matrix (.npy), shape (N_reads x embedding_dim).
+                  Use _emb.npy (not standardised) from calculate_embedding_for_tsv.py.
+--label_file: Path to labels .txt file from calculate_embedding_for_tsv.py.
+              First line must be the header "true_label" and is skipped.
+--outfile: Path for the output .npz file. Default: calculated_distances.npz.
 """
 import pandas as pd
 import argparse
@@ -11,6 +28,14 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 def main(args):
+    """
+    Loads embeddings and labels, computes within- and between-cluster distances,
+    and saves results to a .npz archive.
+
+    Parameters
+    args :
+        Parsed arguments with attributes: embedding_file, label_file, outfile.
+    """
     #get labels
     label_file = open(args.label_file,'r')
     labels = [i.rstrip("\n") for i in label_file.readlines()][1:]
