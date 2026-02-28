@@ -1,13 +1,32 @@
 """
+calculate_embedding_for_tsv.py
+
 Calculate embeddings for a TSV (sequence + label) and save:
 - <base>_emb.npy          (raw embeddings)
-- <base>_emb_stand.npy    (standardized embeddings)
-- <base>_labels.txt       (labels, one per line)
+- <base>_emb_stand.npy    (StandardScaler-normalised embeddings)
+- <base>_labels.txt       (True genome labels, one per line)
 
-Fixed for Nextflow:
-- writes into a user-provided --out_dir (default: current directory)
-- robust model_list parsing (trims whitespace)
-- safer TSV parsing (skips header, ignores empty/broken rows)
+Usage
+-----
+Basic (uses defaults):
+    python calculate_embedding_for_tsv.py \\
+        --tsv_file_path path/to/reads.tsv \\
+        --test_model_dir path/to/DNABERT-S \\
+        --out_dir path/to/output/
+
+With explicit model selection:
+    python calculate_embedding_for_tsv.py \\
+        --tsv_file_path path/to/reads.tsv \\
+        --model_list "test" \\
+        --test_model_dir path/to/DNABERT-S \\
+        --out_dir results/embeddings/ \\
+        --data_dir .
+
+Integration with Nextflow
+--------------------------
+This script is called by the `calculate_embeddings` process in the Nextflow pipeline.
+The process passes --out_dir via publishDir logic and --tsv_file_path from the channel.
+To swap the model, set the `model_list` param in nextflow.config.
 """
 
 import argparse
